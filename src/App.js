@@ -1,7 +1,8 @@
+import { UI } from './UI';
+import { useSharedHooks } from './routes/hooks/useSharedHooks';
+
 export const App = () => {
-   return <>
-      <div>
-         Color map
-      </div>
-   </>;
-}
+   useSharedHooks();
+
+   return <UI/>;
+};
