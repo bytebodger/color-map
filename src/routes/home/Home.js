@@ -92,18 +92,6 @@ export const Home = () => {
                   <option value={1}>
                      RGB: Simple
                   </option>
-                  <option value={2}>
-                     RGB: Squared
-                  </option>
-                  <option value={3}>
-                     RGB+: Simple
-                  </option>
-                  <option value={4}>
-                     RGB+: Squared
-                  </option>
-                  <option value={5}>
-                     RGB: Color Weighted
-                  </option>
                   <option value={0}>
                      HSV: 3D
                   </option>
