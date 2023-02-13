@@ -1,11 +1,12 @@
 import { useRef } from 'react';
-import { useImage } from './useImage';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
+import { use } from '../objects/use';
 
 export const useFile = () => {
-   const current = useRef(null);
-   const image = useImage();
+   const blob = useRef(null);
+   const file = useRef(null);
+   const image = use.image;
 
    const handleFile = (event = {}) => {
       allow.anObject(event, is.not.empty);
@@ -15,15 +16,27 @@ export const useFile = () => {
    const read = (chosenFile = {}) => {
       const fileReader = new FileReader();
       fileReader.onloadend = event => {
-         current.current = chosenFile;
-         image.create(event.target.result);
+         file.current = chosenFile;
+         blob.current = event.target.result;
+         image.create(blob.current);
       };
       fileReader.readAsDataURL(chosenFile);
    };
 
+   const reload = () => {
+      if (!blob.current || !file.current)
+         return;
+      const fileReader = new FileReader();
+      fileReader.onloadend = () => {
+         image.create(blob.current);
+      }
+      fileReader.readAsDataURL(file.current);
+   }
+
    return {
-      current,
+      file,
       handleFile,
       read,
+      reload,
    }
 }
