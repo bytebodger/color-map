@@ -90,10 +90,10 @@ export const Home = () => {
                   value={imageForm.algorithm}
                >
                   <option value={1}>
-                     RGB: Simple
+                     RGB
                   </option>
-                  <option value={0}>
-                     HSV: 3D
+                  <option value={2}>
+                     XYZ
                   </option>
                   <option value={6}>
                      Delta-E
@@ -126,6 +126,33 @@ export const Home = () => {
                   type={'checkbox'}
                />
                Half-Whites
+            </div>
+            <div>
+               <input
+                  checked={imageForm.palettes.quarterWhites}
+                  name={'quarterWhites'}
+                  onChange={imageForm.handlePalettes}
+                  type={'checkbox'}
+               />
+               Quarter-Whites
+            </div>
+            <div>
+               <input
+                  checked={imageForm.palettes.halfBlacks}
+                  name={'halfBlacks'}
+                  onChange={imageForm.handlePalettes}
+                  type={'checkbox'}
+               />
+               Half-Blacks
+            </div>
+            <div>
+               <input
+                  checked={imageForm.palettes.quarterBlacks}
+                  name={'quarterBlacks'}
+                  onChange={imageForm.handlePalettes}
+                  type={'checkbox'}
+               />
+               Quarter-Blacks
             </div>
          </Column>
       </Row>

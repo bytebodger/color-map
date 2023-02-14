@@ -1,5 +1,5 @@
 export const labModel = Object.freeze({
-   x: 0,
-   y: 0,
-   z: 0,
+   blueYellow: 0,
+   lightness: 0,
+   redGreen: 0,
 });

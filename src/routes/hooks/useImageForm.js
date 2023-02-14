@@ -12,6 +12,9 @@ export const useImageForm = () => {
    const [palettes, setPalettes] = useState(local.getItem('palettes', {
       basePaints: true,
       halfWhites: false,
+      quarterWhites: false,
+      halfBlacks: false,
+      quarterBlacks: false,
    }) || {});
    const file = use.file;
 

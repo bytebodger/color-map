@@ -5,14 +5,20 @@ import { algorithm } from '../objects/algorithm';
 import { rgbModel } from '../objects/models/rgbModel';
 import { local } from '@toolz/local-storage';
 import { palettes } from '../arrays/palettes';
+import { xyzModel } from '../objects/models/xyzModel';
+import { labModel } from '../objects/models/labModel';
+import { cmykModel } from '../objects/models/cmykModel';
 
 export const useImage = () => {
    const canvas = useRef(null);
    const context = useRef(null);
    const image = useRef(null);
    let closestColors = {};
-   let lightInsensitivity = 75;
    let palette = [];
+
+   useEffect(() => {
+      canvas.current = document.getElementById('canvas');
+   }, []);
 
    const calculateAverageColor = (imageData = {}) => {
       allow.anObject(imageData, is.not.empty);
@@ -49,18 +55,111 @@ export const useImage = () => {
       };
    };
 
-   useEffect(() => {
-      canvas.current = document.getElementById('canvas');
-   }, []);
-
-   const convertRgbToLab = (red = -1, green = -1, blue = -1) => {
-      allow.aNumber(red, is.not.negative).aNumber(green, is.not.negative).aNumber(blue, is.not.negative);
-      const [x, y, z] = convertRgbToXyz(red, green, blue);
-      return convertXyzTolab(x, y, z);
+   const calculateDeltaE00 = (labColor1 = labModel, labColor2 = labModel) => {
+      allow.anInstanceOf(labColor1, labModel).anInstanceOf(labColor2, labModel);
+      const { lightness: lightness1, redGreen: redGreen1, blueYellow: blueYellow1 } = labColor1;
+      const { lightness: lightness2, redGreen: redGreen2, blueYellow: blueYellow2 } = labColor2;
+      // Utility functions added to Math Object
+      Math.rad2deg = function(rad) {
+         return 360 * rad / (2 * Math.PI);
+      };
+      Math.deg2rad = function(deg) {
+         return (2 * Math.PI * deg) / 360;
+      };
+      // Start Equation
+      // Equation exist on the following URL http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE2000.html
+      const avgL = (lightness1 + lightness2) / 2;
+      const c1 = Math.sqrt(Math.pow(redGreen1, 2) + Math.pow(blueYellow1, 2));
+      const c2 = Math.sqrt(Math.pow(redGreen2, 2) + Math.pow(blueYellow2, 2));
+      const avgC = (c1 + c2) / 2;
+      const g = (1 - Math.sqrt(Math.pow(avgC, 7) / (Math.pow(avgC, 7) + Math.pow(25, 7)))) / 2;
+      const a1p = redGreen1 * (1 + g);
+      const a2p = redGreen2 * (1 + g);
+      const c1p = Math.sqrt(Math.pow(a1p, 2) + Math.pow(blueYellow1, 2));
+      const c2p = Math.sqrt(Math.pow(a2p, 2) + Math.pow(blueYellow2, 2));
+      const avgCp = (c1p + c2p) / 2;
+      let h1p = Math.rad2deg(Math.atan2(blueYellow1, a1p));
+      if (h1p < 0)
+         h1p = h1p + 360;
+      let h2p = Math.rad2deg(Math.atan2(blueYellow2, a2p));
+      if (h2p < 0)
+         h2p = h2p + 360;
+      const avghp = Math.abs(h1p - h2p) > 180 ? (h1p + h2p + 360) / 2 : (h1p + h2p) / 2;
+      const t = 1 -
+         0.17 * Math.cos(Math.deg2rad(avghp - 30))
+         + 0.24 * Math.cos(Math.deg2rad(2 * avghp))
+         + 0.32 * Math.cos(Math.deg2rad(3 * avghp + 6))
+         - 0.2 * Math.cos(Math.deg2rad(4 * avghp - 63));
+      let deltahp = h2p - h1p;
+      if (Math.abs(deltahp) > 180) {
+         if (h2p <= h1p) {
+            deltahp += 360;
+         } else {
+            deltahp -= 360;
+         }
+      }
+      const deltalp = lightness2 - lightness1;
+      const deltacp = c2p - c1p;
+      deltahp = 2 * Math.sqrt(c1p * c2p) * Math.sin(Math.deg2rad(deltahp) / 2);
+      const sl = 1 + ((0.015 * Math.pow(avgL - 50, 2)) / Math.sqrt(20 + Math.pow(avgL - 50, 2)));
+      const sc = 1 + 0.045 * avgCp;
+      const sh = 1 + 0.015 * avgCp * t;
+      const deltaro = 30 * Math.exp(-(Math.pow((avghp - 275) / 25, 2)));
+      const rc = 2 * Math.sqrt(Math.pow(avgCp, 7) / (Math.pow(avgCp, 7) + Math.pow(25, 7)));
+      const rt = -rc * Math.sin(2 * Math.deg2rad(deltaro));
+      const kl = 1;
+      const kc = 1;
+      const kh = 1;
+      return  Math.sqrt(Math.pow(deltalp / (kl * sl), 2)
+         + Math.pow(deltacp / (kc * sc), 2)
+         + Math.pow(deltahp / (kh * sh), 2)
+         + rt * (deltacp / (kc * sc)) * (deltahp / (kh * sh)));
    }
 
-   const convertRgbToXyz = (red = -1, green = -1, blue = -1) => {
-      allow.aNumber(red, is.not.negative).aNumber(green, is.not.negative).aNumber(blue, is.not.negative);
+   const convertCmykToRgb = (cmykColor = cmykModel) => {
+      allow.anInstanceOf(cmykColor, cmykModel);
+      const { cyan, magenta, yellow, key } = cmykColor;
+      let red = cyan * (1.0 - key) + key;
+      let green = magenta * (1.0 - key) + key;
+      let blue = yellow * (1.0 - key) + key;
+      red = Math.round((1.0 - red) * 255.0 + 0.5);
+      green = Math.round((1.0 - green) * 255.0 + 0.5);
+      blue = Math.round((1.0 - blue) * 255.0 + 0.5);
+      return {
+         red,
+         green,
+         blue,
+      }
+   }
+
+   const convertRgbToCmyk = (rgbColor = rgbModel) => {
+      allow.anInstanceOf(rgbColor, rgbModel);
+      const { red, green, blue } = rgbColor;
+      let cyan = 255 - red;
+      let magenta = 255 - green;
+      let yellow = 255 - blue;
+      let key = Math.min(cyan, magenta, yellow);
+      cyan = ((cyan - key) / (255 - key));
+      magenta = ((magenta - key) / (255 - key));
+      yellow = ((yellow  - key) / (255 - key));
+      key = key / 255;
+      return {
+         cyan,
+         magenta,
+         yellow,
+         key,
+      };
+   }
+
+   const convertRgbToLab = (rgbColor = rgbModel) => {
+      allow.anInstanceOf(rgbColor, rgbModel);
+      const xyzColor = convertRgbToXyz(rgbColor);
+      return convertXyzTolab(xyzColor);
+   }
+
+   const convertRgbToXyz = (rgbColor = rgbModel) => {
+      allow.anInstanceOf(rgbColor, rgbModel);
+      let { red, green, blue } = rgbColor;
       if (red > 255)
          red = 255;
       else if (red < 0)
@@ -97,11 +196,16 @@ export const useImage = () => {
       const x = (red * 0.4124564) + (green * 0.3575761) + (blue * 0.1804375);
       const y = (red * 0.2126729) + (green * 0.7151522) + (blue * 0.0721750);
       const z = (red * 0.0193339) + (green * 0.1191920) + (blue * 0.9503041);
-      return [x, y, z];
+      return {
+         x,
+         y,
+         z,
+      };
    }
 
-   const convertXyzTolab = (x = -1, y = -1, z = -1) => {
-      allow.aNumber(x, is.not.negative).aNumber(y, is.not.negative).aNumber(z, is.not.negative);
+   const convertXyzTolab = (xyzColor = xyzModel) => {
+      allow.anInstanceOf(xyzColor, xyzModel);
+      let { x, y, z } = xyzColor;
       // using 10o Observer (CIE 1964)
       // CIE10_D65 = {94.811f, 100f, 107.304f} => Daylight
       // step 1
@@ -125,7 +229,11 @@ export const useImage = () => {
       const lightness = (116 * y) - 16;
       const redGreen = 500 * (x - y);
       const blueYellow = 200 * (y - z);
-      return [lightness, redGreen, blueYellow];
+      return {
+         lightness,
+         redGreen,
+         blueYellow,
+      };
    }
 
    const create = (src = '') => {
@@ -144,61 +252,14 @@ export const useImage = () => {
       return newImage;
    };
 
-   const deltaE00 = (lightness1 = 102, redGreen1 = 102, blueYellow1 = 102, lightness2, redGreen2 = 102, blueYellow2 = 102) => {
-      allow.aNumber(lightness1, -101, 101)
-         .aNumber(redGreen1, -101, 101)
-         .aNumber(blueYellow1, -101, 101)
-         .aNumber(lightness2, -101, 101)
-         .aNumber(redGreen2, -101,101)
-         .aNumber(blueYellow2, -101, 101);
-      // Utility functions added to Math Object
-      Math.rad2deg = function(rad) {
-         return 360 * rad / (2 * Math.PI);
-      };
-      Math.deg2rad = function(deg) {
-         return (2 * Math.PI * deg) / 360;
-      };
-      // Start Equation
-      // Equation exist on the following URL http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE2000.html
-      const avgL = (lightness1 + lightness2) / 2;
-      const c1 = Math.sqrt(Math.pow(redGreen1, 2) + Math.pow(blueYellow1, 2));
-      const c2 = Math.sqrt(Math.pow(redGreen2, 2) + Math.pow(blueYellow2, 2));
-      const avgC = (c1 + c2) / 2;
-      const g = (1 - Math.sqrt(Math.pow(avgC, 7) / (Math.pow(avgC, 7) + Math.pow(25, 7)))) / 2;
-      const a1p = redGreen1 * (1 + g);
-      const a2p = redGreen2 * (1 + g);
-      const c1p = Math.sqrt(Math.pow(a1p, 2) + Math.pow(blueYellow1, 2));
-      const c2p = Math.sqrt(Math.pow(a2p, 2) + Math.pow(blueYellow2, 2));
-      const avgCp = (c1p + c2p) / 2;
-      let h1p = Math.rad2deg(Math.atan2(blueYellow1, a1p));
-      if (h1p < 0)
-         h1p = h1p + 360;
-      let h2p = Math.rad2deg(Math.atan2(blueYellow2, a2p));
-      if (h2p < 0)
-         h2p = h2p + 360;
-      const avghp = Math.abs(h1p - h2p) > 180 ? (h1p + h2p + 360) / 2 : (h1p + h2p) / 2;
-      const t = 1 - 0.17 * Math.cos(Math.deg2rad(avghp - 30)) + 0.24 * Math.cos(Math.deg2rad(2 * avghp)) + 0.32 * Math.cos(Math.deg2rad(3 * avghp + 6)) - 0.2 * Math.cos(Math.deg2rad(4 * avghp - 63));
-      let deltahp = h2p - h1p;
-      if (Math.abs(deltahp) > 180) {
-         if (h2p <= h1p) {
-            deltahp += 360;
-         } else {
-            deltahp -= 360;
-         }
-      }
-      const deltalp = lightness2 - lightness1;
-      const deltacp = c2p - c1p;
-      deltahp = 2 * Math.sqrt(c1p * c2p) * Math.sin(Math.deg2rad(deltahp) / 2);
-      const sl = 1 + ((0.015 * Math.pow(avgL - 50, 2)) / Math.sqrt(20 + Math.pow(avgL - 50, 2)));
-      const sc = 1 + 0.045 * avgCp;
-      const sh = 1 + 0.015 * avgCp * t;
-      const deltaro = 30 * Math.exp(-(Math.pow((avghp - 275) / 25, 2)));
-      const rc = 2 * Math.sqrt(Math.pow(avgCp, 7) / (Math.pow(avgCp, 7) + Math.pow(25, 7)));
-      const rt = -rc * Math.sin(2 * Math.deg2rad(deltaro));
-      const kl = 1;
-      const kc = 1;
-      const kh = 1;
-      return  Math.sqrt(Math.pow(deltalp / (kl * sl), 2) + Math.pow(deltacp / (kc * sc), 2) + Math.pow(deltahp / (kh * sh), 2) + rt * (deltacp / (kc * sc)) * (deltahp / (kh * sh)));
+   const getAlgorithmName = () => {
+      const currentAlgorithm = local.getItem('algorithm');
+      let name;
+      Object.keys(algorithm).forEach(key => {
+         if (algorithm[key] === currentAlgorithm)
+            name = key;
+      })
+      return name;
    }
 
    const getClosestColorInThePalette = (referenceColor = rgbModel) => {
@@ -219,20 +280,19 @@ export const useImage = () => {
             return;
          let distance;
          switch (currentAlgorithm) {
-            case algorithm.HSV_3D:
-               const paletteCoordinates = getCoordinates(paletteColor);
-               const referenceCoordinates = getCoordinates(referenceColor);
-               const xDifferenceSquared = Math.pow((referenceCoordinates.x - paletteCoordinates.x), 2);
-               const yDifferenceSquared = Math.pow((referenceCoordinates.y - paletteCoordinates.y), 2);
-               const zDifferenceSquared = Math.pow((referenceCoordinates.z - paletteCoordinates.z), 2);
-               distance = Math.sqrt(xDifferenceSquared + yDifferenceSquared + zDifferenceSquared);
+            case algorithm.XYZ:
+               const { x: paletteX, y: paletteY, z: paletteZ } = convertRgbToXyz(paletteColor);
+               const { x: referenceX, y: referenceY, z: referenceZ } = convertRgbToXyz(referenceColor);
+               distance = Math.abs(referenceX - paletteX)
+                  + Math.abs(referenceY - paletteY)
+                  + Math.abs(referenceZ - paletteZ);
                break;
             case algorithm.DELTA_E:
-               const paletteLabColor = convertRgbToLab(paletteColor.red, paletteColor.green, paletteColor.blue);
-               const referenceLabColor = convertRgbToLab(referenceColor.red, referenceColor.green, referenceColor.blue);
-               distance = deltaE00(paletteLabColor[0], paletteLabColor[1], paletteLabColor[2], referenceLabColor[0], referenceLabColor[1], referenceLabColor[2]);
+               const paletteLabColor = convertRgbToLab(paletteColor);
+               const referenceLabColor = convertRgbToLab(referenceColor);
+               distance = calculateDeltaE00(paletteLabColor, referenceLabColor);
                break;
-            case algorithm.RGB_SIMPLE:
+            case algorithm.RGB:
             default:
                distance = Math.abs(paletteColor.red - referenceColor.red)
                   + Math.abs(paletteColor.green - referenceColor.green)
@@ -246,55 +306,6 @@ export const useImage = () => {
          }
       });
       return closestColor;
-   };
-
-   const getCoordinates = (rgbObject = rgbModel) => {
-      allow.anInstanceOf(rgbObject, rgbModel);
-      const hsvObject = getHsvObjectFromRgbObject(rgbObject);
-      const theta = hsvObject.hue * 2 * Math.PI;
-      const maxRadius = lightInsensitivity / 2;
-      const radius = hsvObject.saturation * maxRadius;
-      const x = radius * Math.cos(theta) + maxRadius;
-      const y = radius * Math.sin(theta) + maxRadius;
-      return {
-         x,
-         y,
-         z: hsvObject.value * 100,
-      };
-   };
-
-   const getHsvObjectFromRgbObject = (rgbObject = rgbModel) => {
-      allow.anInstanceOf(rgbObject, rgbModel);
-      const red = rgbObject.red / 255;
-      const green = rgbObject.green / 255;
-      const blue = rgbObject.blue / 255;
-      const max = Math.max(red, green, blue);
-      const min = Math.min(red, green, blue);
-      let hue;
-      const value = max;
-      const range = max - min;
-      const saturation = max === 0 ? 0 : range / max;
-      if (max === min) {
-         hue = 0;
-      } else {
-         switch (max) {
-            case red:
-               hue = (green - blue) / range + (green < blue ? 6 : 0);
-               break;
-            case green:
-               hue = (blue - red) / range + 2;
-               break;
-            case blue:
-            default:
-               hue = (red - green) / range + 4;
-         }
-         hue = hue / 6;
-      }
-      return {
-         hue,
-         saturation,
-         value,
-      };
    };
 
    const getPixelIndex = (x = -1, y = -1) => {
@@ -317,12 +328,73 @@ export const useImage = () => {
 
    const loadPalettes = () => {
       const chosenPalettes = local.getItem('palettes');
+      const white = {
+         red: 255,
+         green: 255,
+         blue: 255,
+         name: 'generic white',
+      };
+      const black = {
+         red: 0,
+         green: 0,
+         blue: 0,
+         name: 'generic black',
+      }
       Object.entries(chosenPalettes).forEach(entry => {
          const [ name, shouldLoad ] = entry;
          if (!shouldLoad)
             return;
-         palette = [...palette, ...palettes[name]];
+         if (name === 'halfWhites') {
+            palettes.basePaints.forEach(paint => {
+               const mixed = mixRgbColorsSubtractively([paint, white]);
+               mixed.name = `${paint.name} (Half-White)`;
+               palette.push(mixed);
+            });
+         } else if (name === 'quarterWhites') {
+            palettes.basePaints.forEach(paint => {
+               const mixed = mixRgbColorsSubtractively([paint, paint, paint, white]);
+               mixed.name = `${paint.name} (Quarter-White)`;
+               palette.push(mixed);
+            });
+         } else if (name === 'halfBlacks') {
+            palettes.basePaints.forEach(paint => {
+               const mixed = mixRgbColorsSubtractively([paint, black]);
+               mixed.name = `${paint.name} (Half-Black)`;
+               palette.push(mixed);
+            });
+         } else if (name === 'quarterBlacks') {
+            palettes.basePaints.forEach(paint => {
+               const mixed = mixRgbColorsSubtractively([paint, paint, paint, black]);
+               mixed.name = `${paint.name} (Quarter-Black)`;
+               palette.push(mixed);
+            });
+         } else {
+            palette = [...palette, ...palettes[name]];
+         }
       });
+   }
+
+   const mixRgbColorsSubtractively = (rgbColors = [rgbModel]) => {
+      allow.anArrayOfInstances(rgbColors, rgbModel);
+      let cmykColors = [];
+      rgbColors.forEach(rgbColor => cmykColors.push(convertRgbToCmyk(rgbColor)));
+      let cyan = 0;
+      let magenta = 0;
+      let yellow = 0;
+      let key = 0;
+      cmykColors.forEach(cmykColor => {
+         cyan += cmykColor.cyan;
+         magenta += cmykColor.magenta;
+         yellow += cmykColor.yellow;
+         key += cmykColor.key;
+      });
+      const cmykColor = {
+         cyan: cyan / cmykColors.length,
+         magenta: magenta / cmykColors.length,
+         yellow: yellow / cmykColors.length,
+         key: key / cmykColors.length,
+      };
+      return convertCmykToRgb(cmykColor);
    }
 
    const pixelate = () => {
@@ -362,6 +434,7 @@ export const useImage = () => {
          }
          stats.map.push(row);
       }
+      console.log(`${getAlgorithmName()} calculation finished at ${window.performance.now()}`);
       return stats;
    };
 

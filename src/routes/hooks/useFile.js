@@ -20,7 +20,11 @@ export const useFile = () => {
          blob.current = event.target.result;
          image.create(blob.current);
       };
-      fileReader.readAsDataURL(chosenFile);
+      try {
+         fileReader.readAsDataURL(chosenFile);
+      } catch (e) {
+         // no file - do nothing
+      }
    };
 
    const reload = () => {
