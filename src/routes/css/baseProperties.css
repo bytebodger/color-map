@@ -1,3 +1,11 @@
+.displayNone {
+    display: none;
+}
+
 .marginBottom_8 {
     margin-bottom: 8px;
+}
+
+.minWidth_300 {
+    min-width: 300px;
 }

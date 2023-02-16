@@ -3,27 +3,53 @@ import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
 import { use } from '../objects/use';
 import { local } from '@toolz/local-storage';
+import { algorithm as algorithms } from '../objects/algorithm';
+
+const getPaletteArray = () => {
+   const paletteList = getPaletteList();
+   return paletteList === '' ? [] : paletteList.split(',');
+}
+
+const getPaletteList = () => {
+   const translation = {
+      basePaints: 'Heavy Body Acrylics',
+      halfWhites: 'Half-Whites',
+      thirdWhites: 'Third-Whites',
+      quarterWhites: 'Quarter-Whites',
+   }
+   const palettes = local.getItem('palettes', {
+      basePaints: true,
+      halfWhites: false,
+      thirdWhites: false,
+      quarterWhites: false,
+   });
+   let paletteList = [];
+   Object.entries(palettes).forEach(entry => {
+      const [key, isUsed] = entry;
+      if (!isUsed)
+         return;
+      paletteList.push(translation[key]);
+   });
+   return paletteList.join(',');
+}
 
 export const useImageForm = () => {
-   const [algorithm, setAlgorithm] = useState(Number(local.getItem('algorithm', 1)));
+   const [algorithm, setAlgorithm] = useState(local.getItem('algorithm', algorithms.RGB));
    const [blockSize, setBlockSize] = useState(Number(local.getItem('blockSize', 10)));
    const [colorOrGreyscale, setColorOrGreyscale] = useState(local.getItem('colorOrGreyscale', 'color'));
    const [matchToPalette, setMatchToPalette] = useState(Boolean(local.getItem('matchToPalette', false)));
    const [maximumColors, setMaximumColors] = useState(Number(local.getItem('maximumColors', 0)));
    const [minimumThreshold, setMinimumThreshold] = useState(Number(local.getItem('minimumThreshold', 5)));
-   const [palettes, setPalettes] = useState(local.getItem('palettes', {
-      basePaints: true,
-      halfWhites: false,
-      thirdWhites: false,
-      quarterWhites: false,
-   }) || {});
+   const [paletteList, setPaletteList] = useState(getPaletteList());
+   const [paletteArray, setPaletteArray] = useState(getPaletteArray());
+   const [palettes, setPalettes] = useState(local.getItem('palettes') || {});
+
    const file = use.file;
 
    const handleAlgorithm = (event = {}) => {
       allow.anObject(event, is.not.empty);
       const {value} = event.target;
-      const algorithmId = parseInt(value, 10);
-      updateAlgorithm(algorithmId);
+      updateAlgorithm(value);
    };
 
    const handleBlockSize = (event = {}) => {
@@ -65,16 +91,15 @@ export const useImageForm = () => {
       updateMinimumThreshold(minimum);
    }
 
-   const handlePalettes = (event = {}) => {
-      allow.anObject(event, is.not.empty);
-      const {checked, name} = event.target;
-      updatePalettes(name, checked);
+   const handlePalettes = (name = '', value = false) => {
+      allow.aString(name, is.not.empty).aBoolean(value);
+      updatePalettes(name, value);
    };
 
-   const updateAlgorithm = (algorithmId = -1) => {
-      allow.anInteger(algorithmId, is.not.negative);
-      local.setItem('algorithm', algorithmId);
-      setAlgorithm(algorithmId);
+   const updateAlgorithm = (value = '') => {
+      allow.aString(value, is.not.empty);
+      local.setItem('algorithm', value);
+      setAlgorithm(value);
       file.reload();
    };
 
@@ -118,7 +143,9 @@ export const useImageForm = () => {
       const newPalettes = {...palettes};
       newPalettes[key] = value;
       local.setItem('palettes', newPalettes);
+      setPaletteList(getPaletteList());
       setPalettes(newPalettes);
+      setPaletteArray(getPaletteArray());
       file.reload();
    };
 
@@ -137,6 +164,8 @@ export const useImageForm = () => {
       matchToPalette,
       maximumColors,
       minimumThreshold,
+      paletteArray,
+      paletteList,
       palettes,
    };
 };

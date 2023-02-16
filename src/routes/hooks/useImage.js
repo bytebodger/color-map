@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
-import { algorithm } from '../objects/algorithm';
+import { algorithm as algorithms } from '../objects/algorithm';
 import { rgbModel } from '../objects/models/rgbModel';
 import { local } from '@toolz/local-storage';
 import { palettes } from '../arrays/palettes';
@@ -28,6 +28,7 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
+      const algorithm = local.getItem('algorithm');
       const blockSize = local.getItem('blockSize');
       palette = filterPalette(stats);
       for (let y = 0; y < imageData.height; y += blockSize) {
@@ -60,7 +61,7 @@ export const useImage = () => {
          }
          adjustedStats.map.push(row);
       }
-      console.log(`${getAlgorithmName()} color depth adjustment finished at ${window.performance.now()}`);
+      console.log(`${algorithm} color depth adjustment finished at ${window.performance.now()}`);
       return adjustedStats;
    };
 
@@ -312,16 +313,6 @@ export const useImage = () => {
       return filteredPalette;
    };
 
-   const getAlgorithmName = () => {
-      const currentAlgorithm = local.getItem('algorithm');
-      let name;
-      Object.keys(algorithm).forEach(key => {
-         if (algorithm[key] === currentAlgorithm)
-            name = key;
-      });
-      return name;
-   };
-
    const getClosestColorInThePalette = (referenceColor = rgbModel) => {
       allow.anInstanceOf(referenceColor, rgbModel);
       const key = `${referenceColor.red},${referenceColor.green},${referenceColor.blue}`;
@@ -334,20 +325,20 @@ export const useImage = () => {
          red: -1,
       };
       let shortestDistance = Number.MAX_SAFE_INTEGER;
-      const currentAlgorithm = local.getItem('algorithm');
+      const algorithm = local.getItem('algorithm');
       palette.forEach(paletteColor => {
          if (shortestDistance === 0)
             return;
          let distance;
-         switch (currentAlgorithm) {
-            case algorithm.XYZ:
+         switch (algorithm) {
+            case algorithms.XYZ:
                const {x: paletteX, y: paletteY, z: paletteZ} = convertRgbToXyz(paletteColor);
                const {x: referenceX, y: referenceY, z: referenceZ} = convertRgbToXyz(referenceColor);
                distance = Math.abs(referenceX - paletteX)
                   + Math.abs(referenceY - paletteY)
                   + Math.abs(referenceZ - paletteZ);
                break;
-            case algorithm.CMYK:
+            case algorithms.CMYK:
                const {cyan: paletteCyan, magenta: paletteMagenta, yellow: paletteYellow, key: paletteKey} = convertRgbToCmyk(paletteColor);
                const {cyan: referenceCyan, magenta: referenceMagenta, yellow: referenceYellow, key: referenceKey} = convertRgbToCmyk(referenceColor);
                distance = Math.abs(referenceCyan - paletteCyan)
@@ -355,12 +346,12 @@ export const useImage = () => {
                   + Math.abs(referenceYellow - paletteYellow)
                   + Math.abs(referenceKey - paletteKey);
                break;
-            case algorithm.DELTA_E:
+            case algorithms.DELTA_E:
                const paletteLabColor = convertRgbToLab(paletteColor);
                const referenceLabColor = convertRgbToLab(referenceColor);
                distance = calculateDeltaE00(paletteLabColor, referenceLabColor);
                break;
-            case algorithm.RGB:
+            case algorithms.RGB:
             default:
                distance = Math.abs(paletteColor.red - referenceColor.red)
                   + Math.abs(paletteColor.green - referenceColor.green)
@@ -460,9 +451,10 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
+      const algorithm = local.getItem('algorithm');
       const blockSize = local.getItem('blockSize');
-      const matchToPalette = local.getItem('matchToPalette');
       const colorOrGreyscale = local.getItem('colorOrGreyscale');
+      const matchToPalette = local.getItem('matchToPalette');
       if (matchToPalette)
          loadPalettes();
       for (let y = 0; y < imageData.height; y += blockSize) {
@@ -504,7 +496,10 @@ export const useImage = () => {
          }
          stats.map.push(row);
       }
-      console.log(`${getAlgorithmName()} calculation finished at ${window.performance.now()}`);
+      if (matchToPalette)
+         console.log(`${algorithm} calculation finished at ${window.performance.now()}`);
+      else
+         console.log(`raw calculation finished at ${window.performance.now()}`);
       return stats;
    };
 
