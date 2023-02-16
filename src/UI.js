@@ -56,18 +56,6 @@ export const UI = props => {
       ));
    }
 
-   const drawer = (
-      <Box onClick={handleDrawerToggle} sx={{textAlign: 'center'}}>
-         <Typography variant='h6' sx={{my: 2}}>
-            Paint Map Studio
-         </Typography>
-         <Divider/>
-         <List>
-            {getNavItems()}
-         </List>
-      </Box>
-   );
-
    const container = window !== undefined ? () => window().document.body : undefined;
 
    return (
@@ -83,6 +71,9 @@ export const UI = props => {
                   sx={{mr: 2, display: {sm: 'none'}}}
                >
                   <MenuIcon/>
+                  <span className={'marginLeft_24'}>
+                     Paint Map Studio
+                  </span>
                </IconButton>
                <Typography
                   component={'div'}
@@ -96,19 +87,33 @@ export const UI = props => {
                </Box>
             </Toolbar>
          </AppBar>
-         <Box component='nav'>
+         <Box component={'nav'}>
             <Drawer
-               container={container}
-               variant={'temporary'}
-               open={mobileOpen}
-               onClose={handleDrawerToggle}
                ModalProps={{keepMounted: true}}
+               container={container}
+               onClose={handleDrawerToggle}
+               open={mobileOpen}
                sx={{
                   display: {xs: 'block', sm: 'none'},
                   '& .MuiDrawer-paper': {boxSizing: 'border-box', width: drawerWidth},
                }}
+               variant={'temporary'}
             >
-               {drawer}
+               <Box
+                  onClick={handleDrawerToggle}
+                  sx={{textAlign: 'center'}}
+               >
+                  <Typography
+                     sx={{my: 2}}
+                     variant={'h6'}
+                  >
+                     Paint Map Studio
+                  </Typography>
+                  <Divider/>
+                  <List>
+                     {getNavItems()}
+                  </List>
+               </Box>
             </Drawer>
          </Box>
          <Box
