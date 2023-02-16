@@ -4,12 +4,13 @@ import { is } from '../objects/is';
 import { use } from '../objects/use';
 import { local } from '@toolz/local-storage';
 
-
 export const useImageForm = () => {
    const [algorithm, setAlgorithm] = useState(Number(local.getItem('algorithm', 1)));
    const [blockSize, setBlockSize] = useState(Number(local.getItem('blockSize', 10)));
    const [colorOrGreyscale, setColorOrGreyscale] = useState(local.getItem('colorOrGreyscale', 'color'));
    const [matchToPalette, setMatchToPalette] = useState(Boolean(local.getItem('matchToPalette', false)));
+   const [maximumColors, setMaximumColors] = useState(Number(local.getItem('maximumColors', 0)));
+   const [minimumThreshold, setMinimumThreshold] = useState(Number(local.getItem('minimumThreshold', 5)));
    const [palettes, setPalettes] = useState(local.getItem('palettes', {
       basePaints: true,
       halfWhites: false,
@@ -20,78 +21,106 @@ export const useImageForm = () => {
 
    const handleAlgorithm = (event = {}) => {
       allow.anObject(event, is.not.empty);
-      const { value } = event.target;
+      const {value} = event.target;
       const algorithmId = parseInt(value, 10);
       updateAlgorithm(algorithmId);
-   }
+   };
 
    const handleBlockSize = (event = {}) => {
       allow.anObject(event, is.not.empty);
-      const { value } = event.target;
+      const {value} = event.target;
       const size = parseInt(value, 10);
       updateBlockSize(size);
-   }
+   };
 
    const handleColorOrGreyscale = (event = {}) => {
       allow.anObject(event, is.not.empty);
-      const { value } = event.target;
+      const {value} = event.target;
       updateColorOrGreyscale(value);
-   }
+   };
 
    const handleFile = (event = {}) => {
       allow.anObject(event, is.not.empty);
-      const [ source ] = event.target.files;
+      const [source] = event.target.files;
       file.read(source);
-   }
+   };
 
    const handleMatchToPalette = (event = {}) => {
       allow.anObject(event, is.not.empty);
-      const { checked } = event.target;
+      const {checked} = event.target;
       updateMatchToPalette(checked);
+   };
+
+   const handleMaximumColors = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {value} = event.target;
+      const maximum = parseInt(value, 10);
+      updateMaximumColors(maximum);
+   };
+
+   const handleMinimumThreshold = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {value} = event.target;
+      const minimum = parseInt(value, 10);
+      updateMinimumThreshold(minimum);
    }
 
    const handlePalettes = (event = {}) => {
       allow.anObject(event, is.not.empty);
-      const { checked, name } = event.target;
+      const {checked, name} = event.target;
       updatePalettes(name, checked);
-   }
+   };
 
    const updateAlgorithm = (algorithmId = -1) => {
       allow.anInteger(algorithmId, is.not.negative);
       local.setItem('algorithm', algorithmId);
       setAlgorithm(algorithmId);
       file.reload();
-   }
+   };
 
    const updateBlockSize = (size = 0) => {
       allow.aNumber(size, 1, 100);
       local.setItem('blockSize', size);
       setBlockSize(size);
       file.reload();
-   }
+   };
 
    const updateColorOrGreyscale = (value = '') => {
       allow.oneOf(value, ['color', 'greyscale']);
       local.setItem('colorOrGreyscale', value);
       setColorOrGreyscale(value);
       file.reload();
-   }
+   };
 
    const updateMatchToPalette = (checked = false) => {
       allow.aBoolean(checked);
       local.setItem('matchToPalette', checked);
       setMatchToPalette(Boolean(checked));
       file.reload();
+   };
+
+   const updateMaximumColors = (maximum = -1) => {
+      allow.anInteger(maximum, is.not.negative);
+      local.setItem('maximumColors', maximum);
+      setMaximumColors(maximum);
+      file.reload();
+   };
+
+   const updateMinimumThreshold = (minimum = 0) => {
+      allow.anInteger(minimum, is.positive);
+      local.setItem('minimumThreshold', minimum);
+      setMinimumThreshold(minimum);
+      file.reload();
    }
 
    const updatePalettes = (key = '', value = false) => {
       allow.aString(key, is.not.empty).aBoolean(value);
-      const newPalettes = { ...palettes };
+      const newPalettes = {...palettes};
       newPalettes[key] = value;
       local.setItem('palettes', newPalettes);
       setPalettes(newPalettes);
       file.reload();
-   }
+   };
 
    return {
       algorithm,
@@ -102,8 +131,12 @@ export const useImageForm = () => {
       handleColorOrGreyscale,
       handleFile,
       handleMatchToPalette,
+      handleMaximumColors,
+      handleMinimumThreshold,
       handlePalettes,
       matchToPalette,
+      maximumColors,
+      minimumThreshold,
       palettes,
-   }
-}
+   };
+};

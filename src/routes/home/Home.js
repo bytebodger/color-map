@@ -8,6 +8,59 @@ import '../css/baseProperties.css';
 export const Home = () => {
    const imageForm = use.imageForm;
 
+   const getBlockSizeOptions = () => {
+      const options = [];
+      for (let i = 5; i <=50; i++) {
+         options.push(
+            <option
+               key={`blockSize-${i}`}
+               value={i}
+            >
+               {i}
+            </option>
+         )
+      }
+      return options;
+   }
+
+   const getMaximumColorsOptions = () => {
+      const options = [];
+      options.push(
+         <option
+            key={'maximumColors-0'}
+            value={0}
+         >
+            Unlimited
+         </option>
+      )
+      for (let i = 250; i >= 50; i--) {
+         options.push(
+            <option
+               key={`maximumColors-${i}`}
+               value={i}
+            >
+               {i}
+            </option>
+         )
+      }
+      return options;
+   }
+
+   const getMinimumThresholdOptions = () => {
+      const options = [];
+      for (let i = 1; i <= 20; i++) {
+         options.push(
+            <option
+               key={`minimumThreshold-${i}`}
+               value={i}
+            >
+               {i}
+            </option>
+         )
+      }
+      return options;
+   }
+
    return <>
       <Row className={'marginBottom_8'}>
          <Column xs={2}>
@@ -34,14 +87,12 @@ export const Home = () => {
          </Column>
          <Column xs={10}>
             <div>
-               <input
-                  max={100}
-                  min={1}
+               <select
                   onChange={imageForm.handleBlockSize}
-                  step={1}
-                  type={'number'}
                   value={imageForm.blockSize}
-               />
+               >
+                  {getBlockSizeOptions()}
+               </select>
             </div>
          </Column>
       </Row>
@@ -67,6 +118,46 @@ export const Home = () => {
       >
          <Column xs={2}>
             <div className={'label'}>
+               Color Depth:
+            </div>
+         </Column>
+         <Column xs={10}>
+            <div>
+               <select
+                  onChange={imageForm.handleMaximumColors}
+                  value={imageForm.maximumColors}
+               >
+                  {getMaximumColorsOptions()}
+               </select>
+            </div>
+         </Column>
+      </Row>
+      <Row
+         className={'marginBottom_8'}
+         style={{visibility: imageForm.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
+      >
+         <Column xs={2}>
+            <div className={'label'}>
+               Minimum Threshold:
+            </div>
+         </Column>
+         <Column xs={10}>
+            <div>
+               <select
+                  onChange={imageForm.handleMinimumThreshold}
+                  value={imageForm.minimumThreshold}
+               >
+                  {getMinimumThresholdOptions()}
+               </select>
+            </div>
+         </Column>
+      </Row>
+      <Row
+         className={'marginBottom_8'}
+         style={{visibility: imageForm.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
+      >
+         <Column xs={2}>
+            <div className={'label'}>
                Algorithm:
             </div>
          </Column>
@@ -76,18 +167,10 @@ export const Home = () => {
                   onChange={imageForm.handleAlgorithm}
                   value={imageForm.algorithm}
                >
-                  <option value={1}>
-                     RGB
-                  </option>
-                  <option value={3}>
-                     CMYK
-                  </option>
-                  <option value={2}>
-                     XYZ
-                  </option>
-                  <option value={6}>
-                     Delta-E
-                  </option>
+                  <option value={1}>RGB</option>
+                  <option value={3}>CMYK</option>
+                  <option value={2}>XYZ</option>
+                  <option value={6}>Delta-E</option>
                </select>
             </div>
          </Column>
@@ -107,12 +190,8 @@ export const Home = () => {
                   onChange={imageForm.handleColorOrGreyscale}
                   value={imageForm.colorOrGreyscale}
                >
-                  <option value={'color'}>
-                     Color
-                  </option>
-                  <option value={'greyscale'}>
-                     Greyscale
-                  </option>
+                  <option value={'color'}>Color</option>
+                  <option value={'greyscale'}>Greyscale</option>
                </select>
             </div>
          </Column>

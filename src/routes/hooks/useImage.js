@@ -20,6 +20,50 @@ export const useImage = () => {
       canvas.current = document.getElementById('canvas');
    }, []);
 
+   const adjustColorDepth = (stats = {}) => {
+      allow.anObject(stats, is.not.empty);
+      const imageData = context.current.getImageData(0, 0, canvas.current.width, canvas.current.height);
+      const adjustedStats = {
+         colorCounts: {},
+         colors: [],
+         map: [],
+      };
+      const blockSize = local.getItem('blockSize');
+      palette = filterPalette(stats);
+      for (let y = 0; y < imageData.height; y += blockSize) {
+         const row = [];
+         for (let x = 0; x < imageData.width; x += blockSize) {
+            const remainingX = imageData.width - x;
+            const remainingY = imageData.height - y;
+            const blockX = remainingX > blockSize ? blockSize : remainingX;
+            const blockY = remainingY > blockSize ? blockSize : remainingY;
+            const pixel = getPixelObjectFromImageData(imageData, x, y);
+            const [red] = pixel.red;
+            const [green] = pixel.green;
+            const [blue] = pixel.blue;
+            const referenceColor = {
+               blue,
+               green,
+               red,
+               name: '',
+            };
+            const color = getClosestColorInThePalette(referenceColor);
+            row.push(color);
+            if (Object.hasOwn(adjustedStats.colorCounts, color.name))
+               adjustedStats.colorCounts[color.name]++;
+            else {
+               adjustedStats.colorCounts[color.name] = 1;
+               adjustedStats.colors.push(color);
+            }
+            context.current.fillStyle = `rgb(${color.red}, ${color.green}, ${color.blue})`;
+            context.current.fillRect(x, y, blockX, blockY);
+         }
+         adjustedStats.map.push(row);
+      }
+      console.log(`${getAlgorithmName()} color depth adjustment finished at ${window.performance.now()}`);
+      return adjustedStats;
+   };
+
    const calculateAverageColor = (imageData = {}) => {
       allow.anObject(imageData, is.not.empty);
       let redSum = 0;
@@ -31,9 +75,9 @@ export const useImage = () => {
       for (let x = 0; x < imageData.width; x++) {
          for (let y = 0; y < imageData.height; y++) {
             const pixel = getPixelObjectFromImageData(imageData, x, y);
-            const [ red ] = pixel.red;
-            const [ green ] = pixel.green;
-            const [ blue ] = pixel.blue;
+            const [red] = pixel.red;
+            const [green] = pixel.green;
+            const [blue] = pixel.blue;
             if (red) {
                redSum += red;
                redCounter++;
@@ -57,13 +101,13 @@ export const useImage = () => {
 
    const calculateDeltaE00 = (labColor1 = labModel, labColor2 = labModel) => {
       allow.anInstanceOf(labColor1, labModel).anInstanceOf(labColor2, labModel);
-      const { lightness: lightness1, redGreen: redGreen1, blueYellow: blueYellow1 } = labColor1;
-      const { lightness: lightness2, redGreen: redGreen2, blueYellow: blueYellow2 } = labColor2;
+      const {lightness: lightness1, redGreen: redGreen1, blueYellow: blueYellow1} = labColor1;
+      const {lightness: lightness2, redGreen: redGreen2, blueYellow: blueYellow2} = labColor2;
       // Utility functions added to Math Object
-      Math.rad2deg = function(rad) {
+      Math.rad2deg = function (rad) {
          return 360 * rad / (2 * Math.PI);
       };
-      Math.deg2rad = function(deg) {
+      Math.deg2rad = function (deg) {
          return (2 * Math.PI * deg) / 360;
       };
       // Start Equation
@@ -110,15 +154,15 @@ export const useImage = () => {
       const kl = 1;
       const kc = 1;
       const kh = 1;
-      return  Math.sqrt(Math.pow(deltalp / (kl * sl), 2)
+      return Math.sqrt(Math.pow(deltalp / (kl * sl), 2)
          + Math.pow(deltacp / (kc * sc), 2)
          + Math.pow(deltahp / (kh * sh), 2)
          + rt * (deltacp / (kc * sc)) * (deltahp / (kh * sh)));
-   }
+   };
 
    const convertCmykToRgb = (cmykColor = cmykModel) => {
       allow.anInstanceOf(cmykColor, cmykModel);
-      const { cyan, magenta, yellow, key } = cmykColor;
+      const {cyan, magenta, yellow, key} = cmykColor;
       let red = cyan * (1.0 - key) + key;
       let green = magenta * (1.0 - key) + key;
       let blue = yellow * (1.0 - key) + key;
@@ -129,19 +173,19 @@ export const useImage = () => {
          red,
          green,
          blue,
-      }
-   }
+      };
+   };
 
    const convertRgbToCmyk = (rgbColor = rgbModel) => {
       allow.anInstanceOf(rgbColor, rgbModel);
-      const { red, green, blue } = rgbColor;
+      const {red, green, blue} = rgbColor;
       let cyan = 255 - red;
       let magenta = 255 - green;
       let yellow = 255 - blue;
       let key = Math.min(cyan, magenta, yellow);
       cyan = ((cyan - key) / (255 - key));
       magenta = ((magenta - key) / (255 - key));
-      yellow = ((yellow  - key) / (255 - key));
+      yellow = ((yellow - key) / (255 - key));
       key = key / 255;
       return {
          cyan,
@@ -149,17 +193,17 @@ export const useImage = () => {
          yellow,
          key,
       };
-   }
+   };
 
    const convertRgbToLab = (rgbColor = rgbModel) => {
       allow.anInstanceOf(rgbColor, rgbModel);
       const xyzColor = convertRgbToXyz(rgbColor);
       return convertXyzTolab(xyzColor);
-   }
+   };
 
    const convertRgbToXyz = (rgbColor = rgbModel) => {
       allow.anInstanceOf(rgbColor, rgbModel);
-      let { red, green, blue } = rgbColor;
+      let {red, green, blue} = rgbColor;
       if (red > 255)
          red = 255;
       else if (red < 0)
@@ -201,11 +245,11 @@ export const useImage = () => {
          y,
          z,
       };
-   }
+   };
 
    const convertXyzTolab = (xyzColor = xyzModel) => {
       allow.anInstanceOf(xyzColor, xyzModel);
-      let { x, y, z } = xyzColor;
+      let {x, y, z} = xyzColor;
       // using 10o Observer (CIE 1964)
       // CIE10_D65 = {94.811f, 100f, 107.304f} => Daylight
       // step 1
@@ -234,7 +278,7 @@ export const useImage = () => {
          redGreen,
          blueYellow,
       };
-   }
+   };
 
    const create = (src = '') => {
       allow.aString(src);
@@ -247,9 +291,25 @@ export const useImage = () => {
          canvas.current.height = newImage.height;
          context.current = canvas.current.getContext('2d');
          context.current.drawImage(newImage, 0, 0);
-         pixelate();
+         const stats = pixelate();
+         const matchToPalette = local.getItem('matchToPalette');
+         const maximumColors = local.getItem('maximumColors');
+         if (matchToPalette && maximumColors !== 0)
+            adjustColorDepth(stats);
       };
       return newImage;
+   };
+
+   const filterPalette = (stats = {}) => {
+      allow.anObject(stats, is.not.empty);
+      const sortedColorCounts = sortPalette(stats);
+      const filteredPalette = [];
+      sortedColorCounts.forEach(colorCount => {
+         const [colorName] = colorCount;
+         const filteredColor = stats.colors.find(color => color.name === colorName);
+         filteredPalette.push(filteredColor);
+      });
+      return filteredPalette;
    };
 
    const getAlgorithmName = () => {
@@ -258,9 +318,9 @@ export const useImage = () => {
       Object.keys(algorithm).forEach(key => {
          if (algorithm[key] === currentAlgorithm)
             name = key;
-      })
+      });
       return name;
-   }
+   };
 
    const getClosestColorInThePalette = (referenceColor = rgbModel) => {
       allow.anInstanceOf(referenceColor, rgbModel);
@@ -281,15 +341,15 @@ export const useImage = () => {
          let distance;
          switch (currentAlgorithm) {
             case algorithm.XYZ:
-               const { x: paletteX, y: paletteY, z: paletteZ } = convertRgbToXyz(paletteColor);
-               const { x: referenceX, y: referenceY, z: referenceZ } = convertRgbToXyz(referenceColor);
+               const {x: paletteX, y: paletteY, z: paletteZ} = convertRgbToXyz(paletteColor);
+               const {x: referenceX, y: referenceY, z: referenceZ} = convertRgbToXyz(referenceColor);
                distance = Math.abs(referenceX - paletteX)
                   + Math.abs(referenceY - paletteY)
                   + Math.abs(referenceZ - paletteZ);
                break;
             case algorithm.CMYK:
-               const { cyan: paletteCyan, magenta: paletteMagenta, yellow: paletteYellow, key: paletteKey } = convertRgbToCmyk(paletteColor);
-               const { cyan: referenceCyan, magenta: referenceMagenta, yellow: referenceYellow, key: referenceKey } = convertRgbToCmyk(referenceColor);
+               const {cyan: paletteCyan, magenta: paletteMagenta, yellow: paletteYellow, key: paletteKey} = convertRgbToCmyk(paletteColor);
+               const {cyan: referenceCyan, magenta: referenceMagenta, yellow: referenceYellow, key: referenceKey} = convertRgbToCmyk(referenceColor);
                distance = Math.abs(referenceCyan - paletteCyan)
                   + Math.abs(referenceMagenta - paletteMagenta)
                   + Math.abs(referenceYellow - paletteYellow)
@@ -343,7 +403,7 @@ export const useImage = () => {
          name: 'generic white',
       };
       Object.entries(chosenPalettes).forEach(entry => {
-         const [ name, shouldLoad ] = entry;
+         const [name, shouldLoad] = entry;
          if (!shouldLoad)
             return;
          if (name === 'halfWhites') {
@@ -368,7 +428,7 @@ export const useImage = () => {
             palette = [...palette, ...palettes[name]];
          }
       });
-   }
+   };
 
    const mixRgbColorsSubtractively = (rgbColors = [rgbModel]) => {
       allow.anArrayOfInstances(rgbColors, rgbModel);
@@ -391,12 +451,13 @@ export const useImage = () => {
          key: key / cmykColors.length,
       };
       return convertCmykToRgb(cmykColor);
-   }
+   };
 
    const pixelate = () => {
       const imageData = context.current.getImageData(0, 0, canvas.current.width, canvas.current.height);
       const stats = {
-         colors: {},
+         colorCounts: {},
+         colors: [],
          map: [],
       };
       const blockSize = local.getItem('blockSize');
@@ -424,31 +485,57 @@ export const useImage = () => {
                referenceColor.green = darkness;
                referenceColor.blue = darkness;
             }
-            const color = matchToPalette ? getClosestColorInThePalette(referenceColor) : averageColor;
-            row.push(color);
-            if (!color.name) {
-               color.red = Math.round(color.red);
-               color.green = Math.round(color.green);
-               color.blue = Math.round(color.green);
-               color.name = `${color.red}_${color.green}_${color.blue}`;
+            const closestColor = matchToPalette ? getClosestColorInThePalette(referenceColor) : averageColor;
+            row.push(closestColor);
+            if (!closestColor.name) {
+               closestColor.red = Math.round(closestColor.red);
+               closestColor.green = Math.round(closestColor.green);
+               closestColor.blue = Math.round(closestColor.green);
+               closestColor.name = `${closestColor.red}_${closestColor.green}_${closestColor.blue}`;
             }
-            if (Object.hasOwn(stats.colors, color.name))
-               stats.colors[color.name]++;
-            else
-               stats.colors[color.name] = 1;
-            context.current.fillStyle = `rgb(${color.red}, ${color.green}, ${color.blue})`;
+            if (Object.hasOwn(stats.colorCounts, closestColor.name))
+               stats.colorCounts[closestColor.name]++;
+            else {
+               stats.colorCounts[closestColor.name] = 1;
+               stats.colors.push(closestColor);
+            }
+            context.current.fillStyle = `rgb(${closestColor.red}, ${closestColor.green}, ${closestColor.blue})`;
             context.current.fillRect(x, y, blockX, blockY);
          }
          stats.map.push(row);
       }
       console.log(`${getAlgorithmName()} calculation finished at ${window.performance.now()}`);
-      console.log('stats', stats);
       return stats;
+   };
+
+   const sortPalette = (stats = {}) => {
+      allow.anObject(stats, is.not.empty);
+
+      const sort = (a, b) => {
+         const [, aCount] = a;
+         const [, bCount] = b;
+         if (aCount > bCount)
+            return -1;
+         else if (aCount < bCount)
+            return 1;
+         else
+            return 0;
+      };
+
+      const colorCounts = [];
+      Object.entries(stats.colorCounts).forEach(colorCount => colorCounts.push(colorCount));
+      colorCounts.sort(sort);
+      const maximumColors = local.getItem('maximumColors');
+      const minimumThreshold = local.getItem('minimumThreshold');
+      return colorCounts.filter((colorCount, index) => {
+         const [, count] = colorCount;
+         return index < maximumColors && count >= minimumThreshold;
+      });
    };
 
    return {
       create,
       image,
       pixelate,
-   }
-}
+   };
+};
