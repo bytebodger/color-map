@@ -33,7 +33,7 @@ export const Home = () => {
             Unlimited
          </option>
       )
-      for (let i = 250; i >= 50; i--) {
+      for (let i = 250; i >= 20; i--) {
          options.push(
             <option
                key={`maximumColors-${i}`}
