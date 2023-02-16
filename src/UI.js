@@ -1,25 +1,13 @@
-import { useMemo } from 'react';
 import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
 import { Home } from './routes/home/Home';
 import { Route, Routes } from 'react-router-dom';
+import './routes/css/baseProperties.css';
+import './ui.css';
 
 export const UI = () => {
-
-   const style = useMemo(() => {
-      return {
-         marginTop20: {
-            marginTop: 20,
-         },
-         row: {
-            marginTop: 20,
-            minWidth: 350,
-         },
-      }
-   }, []);
-
    return <>
-      <Row style={style.row}>
+      <Row className={'row'}>
          <Column xs={1}/>
          <Column xs={10}>
             <Routes>
@@ -33,7 +21,7 @@ export const UI = () => {
                   path={'*'}
                />
             </Routes>
-            <div style={style.marginTop20}>
+            <div className={'marginTop_20'}>
                <canvas id={'canvas'}></canvas>
             </div>
          </Column>
