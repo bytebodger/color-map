@@ -8,15 +8,22 @@ import { local } from '@toolz/local-storage';
 export const useImageForm = () => {
    const [algorithm, setAlgorithm] = useState(Number(local.getItem('algorithm', 1)));
    const [blockSize, setBlockSize] = useState(Number(local.getItem('blockSize', 10)));
+   const [colorOrGreyscale, setColorOrGreyscale] = useState(local.getItem('colorOrGreyscale', 'color'));
    const [matchToPalette, setMatchToPalette] = useState(Boolean(local.getItem('matchToPalette', false)));
    const [palettes, setPalettes] = useState(local.getItem('palettes', {
       basePaints: true,
       halfWhites: false,
+      thirdWhites: false,
       quarterWhites: false,
-      halfBlacks: false,
-      quarterBlacks: false,
    }) || {});
    const file = use.file;
+
+   const handleAlgorithm = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const { value } = event.target;
+      const algorithmId = parseInt(value, 10);
+      updateAlgorithm(algorithmId);
+   }
 
    const handleBlockSize = (event = {}) => {
       allow.anObject(event, is.not.empty);
@@ -25,11 +32,10 @@ export const useImageForm = () => {
       updateBlockSize(size);
    }
 
-   const handleAlgorithm = (event = {}) => {
+   const handleColorOrGreyscale = (event = {}) => {
       allow.anObject(event, is.not.empty);
       const { value } = event.target;
-      const algorithmId = parseInt(value, 10);
-      updateAlgorithm(algorithmId);
+      updateColorOrGreyscale(value);
    }
 
    const handleFile = (event = {}) => {
@@ -64,6 +70,13 @@ export const useImageForm = () => {
       file.reload();
    }
 
+   const updateColorOrGreyscale = (value = '') => {
+      allow.oneOf(value, ['color', 'greyscale']);
+      local.setItem('colorOrGreyscale', value);
+      setColorOrGreyscale(value);
+      file.reload();
+   }
+
    const updateMatchToPalette = (checked = false) => {
       allow.aBoolean(checked);
       local.setItem('matchToPalette', checked);
@@ -83,8 +96,10 @@ export const useImageForm = () => {
    return {
       algorithm,
       blockSize,
+      colorOrGreyscale,
       handleAlgorithm,
       handleBlockSize,
+      handleColorOrGreyscale,
       handleFile,
       handleMatchToPalette,
       handlePalettes,

@@ -287,6 +287,14 @@ export const useImage = () => {
                   + Math.abs(referenceY - paletteY)
                   + Math.abs(referenceZ - paletteZ);
                break;
+            case algorithm.CMYK:
+               const { cyan: paletteCyan, magenta: paletteMagenta, yellow: paletteYellow, key: paletteKey } = convertRgbToCmyk(paletteColor);
+               const { cyan: referenceCyan, magenta: referenceMagenta, yellow: referenceYellow, key: referenceKey } = convertRgbToCmyk(referenceColor);
+               distance = Math.abs(referenceCyan - paletteCyan)
+                  + Math.abs(referenceMagenta - paletteMagenta)
+                  + Math.abs(referenceYellow - paletteYellow)
+                  + Math.abs(referenceKey - paletteKey);
+               break;
             case algorithm.DELTA_E:
                const paletteLabColor = convertRgbToLab(paletteColor);
                const referenceLabColor = convertRgbToLab(referenceColor);
@@ -334,12 +342,6 @@ export const useImage = () => {
          blue: 255,
          name: 'generic white',
       };
-      const black = {
-         red: 0,
-         green: 0,
-         blue: 0,
-         name: 'generic black',
-      }
       Object.entries(chosenPalettes).forEach(entry => {
          const [ name, shouldLoad ] = entry;
          if (!shouldLoad)
@@ -350,22 +352,16 @@ export const useImage = () => {
                mixed.name = `${paint.name} (Half-White)`;
                palette.push(mixed);
             });
+         } else if (name === 'thirdWhites') {
+            palettes.basePaints.forEach(paint => {
+               const mixed = mixRgbColorsSubtractively([paint, paint, white]);
+               mixed.name = `${paint.name} (Third-White)`;
+               palette.push(mixed);
+            });
          } else if (name === 'quarterWhites') {
             palettes.basePaints.forEach(paint => {
                const mixed = mixRgbColorsSubtractively([paint, paint, paint, white]);
                mixed.name = `${paint.name} (Quarter-White)`;
-               palette.push(mixed);
-            });
-         } else if (name === 'halfBlacks') {
-            palettes.basePaints.forEach(paint => {
-               const mixed = mixRgbColorsSubtractively([paint, black]);
-               mixed.name = `${paint.name} (Half-Black)`;
-               palette.push(mixed);
-            });
-         } else if (name === 'quarterBlacks') {
-            palettes.basePaints.forEach(paint => {
-               const mixed = mixRgbColorsSubtractively([paint, paint, paint, black]);
-               mixed.name = `${paint.name} (Quarter-Black)`;
                palette.push(mixed);
             });
          } else {
@@ -405,6 +401,7 @@ export const useImage = () => {
       };
       const blockSize = local.getItem('blockSize');
       const matchToPalette = local.getItem('matchToPalette');
+      const colorOrGreyscale = local.getItem('colorOrGreyscale');
       if (matchToPalette)
          loadPalettes();
       for (let y = 0; y < imageData.height; y += blockSize) {
@@ -421,20 +418,31 @@ export const useImage = () => {
                red: averageColor.red,
                name: '',
             };
+            if (colorOrGreyscale === 'greyscale') {
+               const darkness = Math.round((averageColor.red + averageColor.green + averageColor.blue) / 3);
+               referenceColor.red = darkness;
+               referenceColor.green = darkness;
+               referenceColor.blue = darkness;
+            }
             const color = matchToPalette ? getClosestColorInThePalette(referenceColor) : averageColor;
             row.push(color);
-            if (color.name) {
-               if (Object.hasOwn(stats.colors, color.name))
-                  stats.colors[color.name]++;
-               else
-                  stats.colors[color.name] = 1;
+            if (!color.name) {
+               color.red = Math.round(color.red);
+               color.green = Math.round(color.green);
+               color.blue = Math.round(color.green);
+               color.name = `${color.red}_${color.green}_${color.blue}`;
             }
+            if (Object.hasOwn(stats.colors, color.name))
+               stats.colors[color.name]++;
+            else
+               stats.colors[color.name] = 1;
             context.current.fillStyle = `rgb(${color.red}, ${color.green}, ${color.blue})`;
             context.current.fillRect(x, y, blockX, blockY);
          }
          stats.map.push(row);
       }
       console.log(`${getAlgorithmName()} calculation finished at ${window.performance.now()}`);
+      console.log('stats', stats);
       return stats;
    };
 
