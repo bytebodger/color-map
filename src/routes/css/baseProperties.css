@@ -2,6 +2,10 @@
     display: none;
 }
 
+.fontSize_0_9em {
+    font-size: 0.9em;
+}
+
 .marginBottom_8 {
     margin-bottom: 8px;
 }

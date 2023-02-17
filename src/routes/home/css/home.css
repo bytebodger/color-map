@@ -18,3 +18,19 @@
     position: relative;
     top: 8px;
 }
+
+.questionMarkIcon {
+    color: #27b039;
+    cursor: pointer;
+    margin-left: 8px;
+    position: relative;
+    top: 8px;
+}
+
+.questionMarkIcon2 {
+    color: #27b039;
+    cursor: pointer;
+    margin-right: 16px;
+    position: relative;
+    top: 16px;
+}

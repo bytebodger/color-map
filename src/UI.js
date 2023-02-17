@@ -14,12 +14,13 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Home } from './routes/home/Home';
 import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
 import './ui.css';
 import './routes/css/baseProperties.css';
+import { About } from './routes/about/About';
 
 const drawerWidth = 240;
 const navItems = ['Home', 'About'];
@@ -27,38 +28,39 @@ const navItems = ['Home', 'About'];
 export const UI = props => {
    const {window} = props;
    const [mobileOpen, setMobileOpen] = useState(false);
+   const navigate = useNavigate();
 
-   const handleDrawerToggle = () => {
-      setMobileOpen(prevState => !prevState);
-   };
+   const container = window !== undefined ? () => window().document.body : undefined;
 
    const getNavItemButtons = () => {
       return navItems.map(item => (
          <Button
             key={item}
+            onClick={() => navigate('/' + item.toLowerCase())}
             sx={{color: '#fff'}}
          >
             {item}
          </Button>
       ));
-   }
+   };
 
    const getNavItems = () => {
       return navItems.map((item) => (
          <ListItem
             disablePadding={true}
             key={item}
+            onClick={() => navigate('/' + item.toLowerCase())}
          >
             <ListItemButton sx={{textAlign: 'center'}}>
                <ListItemText primary={item}/>
             </ListItemButton>
          </ListItem>
       ));
-   }
+   };
 
-   const container = window !== undefined ? () => window().document.body : undefined;
+   const handleDrawerToggle = () => setMobileOpen(prevState => !prevState);
 
-   return (
+   return <>
       <Box sx={{display: 'flex'}}>
          <CssBaseline/>
          <AppBar component={'nav'}>
@@ -122,28 +124,35 @@ export const UI = props => {
          >
             <Toolbar/>
          </Box>
-         <Row className={'row'}>
-            <Column>
-               <Routes>
-                  <Route
-                     element={
-                        <Home/>}
-                     index={true}
-                     path={'/'}
-                  />
-                  <Route
-                     element={
-                        <Home/>}
-                     path={'*'}
-                  />
-               </Routes>
-               <div className={'marginTop_20'}>
-                  <canvas id={'canvas'}></canvas>
-               </div>
-            </Column>
-         </Row>
       </Box>
-   );
+      <Row className={'row'}>
+         <Column xs={1}/>
+         <Column xs={10}>
+            <Routes>
+               <Route
+                  element={
+                     <About/>}
+                  path={'/about'}
+               />
+               <Route
+                  element={
+                     <Home/>}
+                  index={true}
+                  path={'/'}
+               />
+               <Route
+                  element={
+                     <Home/>}
+                  path={'*'}
+               />
+            </Routes>
+            <div className={'marginTop_20'}>
+               <canvas id={'canvas'}></canvas>
+            </div>
+         </Column>
+         <Column xs={1}/>
+      </Row>
+   </>
 };
 
 UI.propTypes = {
