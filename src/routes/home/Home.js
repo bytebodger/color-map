@@ -1,4 +1,3 @@
-import { use } from '../objects/use';
 import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
 import { css3 } from '@toolz/css3/src/css3';
@@ -6,11 +5,14 @@ import './css/home.css';
 import '../css/baseProperties.css';
 import { inputType } from '../objects/inputType';
 import { algorithm as algorithms } from '../objects/algorithm';
-import { Button, Select, MenuItem, Checkbox, OutlinedInput, ListItemText, InputLabel, FormControl, FormGroup, FormControlLabel, Modal } from '@mui/material';
+import { Button, Select, MenuItem, Checkbox, OutlinedInput, ListItemText, InputLabel, FormControl, FormGroup, FormControlLabel, Modal, CircularProgress, Backdrop } from '@mui/material';
 import { useRef, useState } from 'react';
 import { HelpTwoTone } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { useImageForm } from '../hooks/useImageForm';
+import { useFile } from '../hooks/useFile';
+import { useImage } from '../hooks/useImage';
 
 const style = {
    position: 'absolute',
@@ -19,13 +21,11 @@ const style = {
    transform: 'translate(-50%, -50%)',
    width: '50%',
    bgcolor: 'background.paper',
-   border: '2px solid #000',
    boxShadow: 24,
    p: 4,
 };
 
 export const Home = () => {
-   const imageForm = use.imageForm;
    const selectImageInputRef = useRef(null);
    const [algorithmModalOpen, setAlgorithmModalOpen] = useState(false);
    const [blockSizeModalOpen, setBlockSizeModalOpen] = useState(false);
@@ -35,6 +35,13 @@ export const Home = () => {
    const [minimumTresholdModalOpen, setMinimumThresholdModalOpen] = useState(false);
    const [palettesModalOpen, setPalettesModalOpen] = useState(false);
    const [selectImageModalOpen, setSelectImageModalOpen] = useState(false);
+   const imageForm = useImageForm();
+   const file = useFile();
+   const image = useImage();
+   imageForm.setFileHook(file);
+   file.setImageFormHook(imageForm);
+   file.setImageHook(image);
+   image.setImageFormHook(imageForm);
 
    const getAlgorithmOptions = () => {
       const options = [];
@@ -149,6 +156,16 @@ export const Home = () => {
    const handleImageButton = () => selectImageInputRef.current && selectImageInputRef.current.click();
 
    return <>
+      <Backdrop
+         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+         open={imageForm.showProcessing}
+      >
+         <div className={'textAlignCenter'}>
+            <CircularProgress color="inherit"/>
+            <br/>
+            Image Processing...
+         </div>
+      </Backdrop>
       <Modal
          aria-describedby={'selectImageModalDescription'}
          aria-labelledby={'selectImageModalTitle'}
@@ -168,7 +185,7 @@ export const Home = () => {
                sx={{ mt: 2, textAlign: 'justify' }}
             >
                You must select a valid image file from your local system.  Once a valid image has been loaded, you will see it displayed below this form.
-               Thereafter, every time you change one of the settings, the image will be automatically reloaded with those settings applied.
+               Thereafter, every time you change one of the settings, the image will be automatically reloaded with the new settings applied.
             </Typography>
          </Box>
       </Modal>

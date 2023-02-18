@@ -15,6 +15,11 @@ export const useImage = () => {
    const image = useRef(null);
    let closestColors = {};
    let palette = [];
+   let imageFormHook;
+   let totalBlocks;
+   let blocksProcessed;
+   let currentProgress;
+   let previousProgress;
 
    useEffect(() => {
       canvas.current = document.getElementById('canvas');
@@ -61,6 +66,7 @@ export const useImage = () => {
          }
          adjustedStats.map.push(row);
       }
+      imageFormHook.updateShowProcessing(false);
       console.log(`${algorithm} color depth adjustment finished at ${window.performance.now()}`);
       return adjustedStats;
    };
@@ -283,6 +289,7 @@ export const useImage = () => {
 
    const create = (src = '') => {
       allow.aString(src);
+      //imageFormHook.updateShowProcessing(true);
       const source = src === '' ? image.current.src : src;
       const newImage = new Image();
       newImage.src = source;
@@ -297,6 +304,8 @@ export const useImage = () => {
          const maximumColors = local.getItem('maximumColors');
          if (matchToPalette && maximumColors !== 0)
             adjustColorDepth(stats);
+         else
+            imageFormHook.updateShowProcessing(false);
       };
       return newImage;
    };
@@ -457,6 +466,9 @@ export const useImage = () => {
       const matchToPalette = local.getItem('matchToPalette');
       if (matchToPalette)
          loadPalettes();
+      totalBlocks = Math.ceil(imageData.height / blockSize) * Math.ceil(imageData.width / blockSize);
+      blocksProcessed = 0;
+      previousProgress = 0;
       for (let y = 0; y < imageData.height; y += blockSize) {
          const row = [];
          for (let x = 0; x < imageData.width; x += blockSize) {
@@ -493,6 +505,12 @@ export const useImage = () => {
             }
             context.current.fillStyle = `rgb(${closestColor.red}, ${closestColor.green}, ${closestColor.blue})`;
             context.current.fillRect(x, y, blockX, blockY);
+            blocksProcessed++;
+            currentProgress = Math.ceil((blocksProcessed / totalBlocks) * 100);
+            if (currentProgress !== previousProgress && currentProgress % 5 === 0) {
+               console.log(`${currentProgress}% complete`);
+            }
+            previousProgress = currentProgress;
          }
          stats.map.push(row);
       }
@@ -502,6 +520,11 @@ export const useImage = () => {
          console.log(`raw calculation finished at ${window.performance.now()}`);
       return stats;
    };
+
+   const setImageFormHook = (hook = {}) => {
+      allow.anObject(hook);
+      imageFormHook = hook;
+   }
 
    const sortPalette = (stats = {}) => {
       allow.anObject(stats, is.not.empty);
@@ -532,5 +555,6 @@ export const useImage = () => {
       create,
       image,
       pixelate,
+      setImageFormHook,
    };
 };

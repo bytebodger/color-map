@@ -21,3 +21,7 @@
 .minWidth_300 {
     min-width: 300px;
 }
+
+.textAlignCenter {
+    text-align: center;
+}

@@ -134,12 +134,13 @@ export const UI = props => {
                      <About/>}
                   path={'/about'}
                />
-               <Route
-                  element={
-                     <Home/>}
-                  index={true}
-                  path={'/'}
-               />
+                  <Route
+                     element={
+                        <Home/>
+                     }
+                     index={true}
+                     path={'/'}
+                  />
                <Route
                   element={
                      <Home/>}

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
-import { use } from '../objects/use';
 import { local } from '@toolz/local-storage';
 import { algorithm as algorithms } from '../objects/algorithm';
 
@@ -43,8 +42,8 @@ export const useImageForm = () => {
    const [paletteList, setPaletteList] = useState(getPaletteList());
    const [paletteArray, setPaletteArray] = useState(getPaletteArray());
    const [palettes, setPalettes] = useState(local.getItem('palettes') || {});
-
-   const file = use.file;
+   const [showProcessing, setShowProcessing] = useState(false);
+   let fileHook;
 
    const handleAlgorithm = (event = {}) => {
       allow.anObject(event, is.not.empty);
@@ -68,7 +67,7 @@ export const useImageForm = () => {
    const handleFile = (event = {}) => {
       allow.anObject(event, is.not.empty);
       const [source] = event.target.files;
-      file.read(source);
+      fileHook.read(source);
    };
 
    const handleMatchToPalette = (event = {}) => {
@@ -96,46 +95,51 @@ export const useImageForm = () => {
       updatePalettes(name, value);
    };
 
+   const setFileHook = (hook = {}) => {
+      allow.anObject(hook, is.not.empty);
+      fileHook = hook;
+   }
+
    const updateAlgorithm = (value = '') => {
       allow.aString(value, is.not.empty);
       local.setItem('algorithm', value);
       setAlgorithm(value);
-      file.reload();
+      fileHook.reload();
    };
 
    const updateBlockSize = (size = 0) => {
       allow.aNumber(size, 1, 100);
       local.setItem('blockSize', size);
       setBlockSize(size);
-      file.reload();
+      fileHook.reload();
    };
 
    const updateColorOrGreyscale = (value = '') => {
       allow.oneOf(value, ['color', 'greyscale']);
       local.setItem('colorOrGreyscale', value);
       setColorOrGreyscale(value);
-      file.reload();
+      fileHook.reload();
    };
 
    const updateMatchToPalette = (checked = false) => {
       allow.aBoolean(checked);
       local.setItem('matchToPalette', checked);
       setMatchToPalette(Boolean(checked));
-      file.reload();
+      fileHook.reload();
    };
 
    const updateMaximumColors = (maximum = -1) => {
       allow.anInteger(maximum, is.not.negative);
       local.setItem('maximumColors', maximum);
       setMaximumColors(maximum);
-      file.reload();
+      fileHook.reload();
    };
 
    const updateMinimumThreshold = (minimum = 0) => {
       allow.anInteger(minimum, is.positive);
       local.setItem('minimumThreshold', minimum);
       setMinimumThreshold(minimum);
-      file.reload();
+      fileHook.reload();
    }
 
    const updatePalettes = (key = '', value = false) => {
@@ -146,8 +150,13 @@ export const useImageForm = () => {
       setPaletteList(getPaletteList());
       setPalettes(newPalettes);
       setPaletteArray(getPaletteArray());
-      file.reload();
+      fileHook.reload();
    };
+
+   const updateShowProcessing = (show = false) => {
+      allow.aBoolean(show);
+      setShowProcessing(show);
+   }
 
    return {
       algorithm,
@@ -167,5 +176,8 @@ export const useImageForm = () => {
       paletteArray,
       paletteList,
       palettes,
+      setFileHook,
+      showProcessing,
+      updateShowProcessing,
    };
 };
