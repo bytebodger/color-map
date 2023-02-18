@@ -297,7 +297,7 @@ export const useImage = () => {
          image.current = newImage;
          canvas.current.width = newImage.width;
          canvas.current.height = newImage.height;
-         context.current = canvas.current.getContext('2d');
+         context.current = canvas.current.getContext('2d', {alpha: false, willReadFrequently: true});
          context.current.drawImage(newImage, 0, 0);
          const stats = pixelate();
          const matchToPalette = local.getItem('matchToPalette');
