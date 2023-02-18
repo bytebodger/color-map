@@ -134,13 +134,13 @@ export const UI = props => {
                      <About/>}
                   path={'/about'}
                />
-                  <Route
-                     element={
-                        <Home/>
-                     }
-                     index={true}
-                     path={'/'}
-                  />
+               <Route
+                  element={
+                     <Home/>
+                  }
+                  index={true}
+                  path={'/'}
+               />
                <Route
                   element={
                      <Home/>}
@@ -153,7 +153,7 @@ export const UI = props => {
          </Column>
          <Column xs={1}/>
       </Row>
-   </>
+   </>;
 };
 
 UI.propTypes = {
