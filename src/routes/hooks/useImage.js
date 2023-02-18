@@ -289,7 +289,6 @@ export const useImage = () => {
 
    const create = (src = '') => {
       allow.aString(src);
-      //imageFormHook.updateShowProcessing(true);
       const source = src === '' ? image.current.src : src;
       const newImage = new Image();
       newImage.src = source;
@@ -385,7 +384,6 @@ export const useImage = () => {
       allow.anObject(imageData).anInteger(x, is.not.negative).anInteger(y, is.not.negative);
       const index = getPixelIndex(x, y);
       return {
-         alpa: [imageData.data[index + 3], index + 3],
          blue: [imageData.data[index + 2], index + 2],
          green: [imageData.data[index + 1], index + 1],
          red: [imageData.data[index], index],
