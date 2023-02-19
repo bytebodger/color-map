@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useContext } from 'react';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
 import { algorithm as algorithms } from '../objects/algorithm';
@@ -8,14 +8,15 @@ import { palettes } from '../arrays/palettes';
 import { xyzModel } from '../objects/models/xyzModel';
 import { labModel } from '../objects/models/labModel';
 import { cmykModel } from '../objects/models/cmykModel';
+import { IndexState } from '../index/components/IndexContainer';
 
 export const useImage = () => {
    const canvas = useRef(null);
    const context = useRef(null);
    const image = useRef(null);
+   const indexState = useContext(IndexState);
    let closestColors = {};
    let palette = [];
-   let imageFormHook;
    let totalBlocks;
    let blocksProcessed;
    let currentProgress;
@@ -43,10 +44,7 @@ export const useImage = () => {
             const remainingY = imageData.height - y;
             const blockX = remainingX > blockSize ? blockSize : remainingX;
             const blockY = remainingY > blockSize ? blockSize : remainingY;
-            const pixel = getPixelObjectFromImageData(imageData, x, y);
-            const [red] = pixel.red;
-            const [green] = pixel.green;
-            const [blue] = pixel.blue;
+            const {red, green, blue} = getRgbFromImageData(imageData, x, y);
             const referenceColor = {
                blue,
                green,
@@ -66,7 +64,7 @@ export const useImage = () => {
          }
          adjustedStats.map.push(row);
       }
-      imageFormHook.updateShowProcessing(false);
+      indexState.setShowProcessing(false);
       console.log(`${algorithm} color depth adjustment finished at ${window.performance.now()}`);
       return adjustedStats;
    };
@@ -81,10 +79,7 @@ export const useImage = () => {
       let blueCounter = 0;
       for (let x = 0; x < imageData.width; x++) {
          for (let y = 0; y < imageData.height; y++) {
-            const pixel = getPixelObjectFromImageData(imageData, x, y);
-            const [red] = pixel.red;
-            const [green] = pixel.green;
-            const [blue] = pixel.blue;
+            const {red, green, blue} = getRgbFromImageData(imageData, x, y);
             if (red) {
                redSum += red;
                redCounter++;
@@ -256,6 +251,9 @@ export const useImage = () => {
 
    const convertXyzTolab = (xyzColor = xyzModel) => {
       allow.anInstanceOf(xyzColor, xyzModel);
+
+      const adjust = value => value > 0.008856 ? Math.pow(value, (1 / 3)) : (7.787 * value) + (16 / 116);
+
       let {x, y, z} = xyzColor;
       // using 10o Observer (CIE 1964)
       // CIE10_D65 = {94.811f, 100f, 107.304f} => Daylight
@@ -264,18 +262,9 @@ export const useImage = () => {
       y = y / 100;
       z = z / 107.304;
       // step 2
-      if (x > 0.008856)
-         x = Math.pow(x, (1 / 3));
-      else
-         x = (7.787 * x) + (16 / 116);
-      if (y > 0.008856)
-         y = Math.pow(y, (1 / 3));
-      else
-         y = (7.787 * y) + (16 / 116);
-      if (z > 0.008856)
-         z = Math.pow(z, (1 / 3));
-      else
-         z = (7.787 * z) + (16 / 116);
+      x = adjust(x);
+      y = adjust(y);
+      z = adjust(z);
       // step 3
       const lightness = (116 * y) - 16;
       const redGreen = 500 * (x - y);
@@ -304,7 +293,7 @@ export const useImage = () => {
          if (matchToPalette && maximumColors !== 0)
             adjustColorDepth(stats);
          else
-            imageFormHook.updateShowProcessing(false);
+            indexState.setShowProcessing(false);
       };
       return newImage;
    };
@@ -380,7 +369,7 @@ export const useImage = () => {
       return ((image.current.width * y) + x) * 4;
    };
 
-   const getPixelObjectFromImageData = (imageData = {}, x = -1, y = -1) => {
+   const getPixelFromImageData = (imageData = {}, x = -1, y = -1) => {
       allow.anObject(imageData).anInteger(x, is.not.negative).anInteger(y, is.not.negative);
       const index = getPixelIndex(x, y);
       return {
@@ -391,6 +380,20 @@ export const useImage = () => {
          y,
       };
    };
+
+   const getRgbFromImageData = (imageData = {}, x = -1, y = -1) => {
+      allow.anObject(imageData).anInteger(x, is.not.negative).anInteger(y, is.not.negative);
+      const pixelObject = getPixelFromImageData(imageData, x, y);
+      const [red] = pixelObject.red;
+      const [green] = pixelObject.green;
+      const [blue] = pixelObject.blue;
+      return {
+         red,
+         green,
+         blue,
+         name: '',
+      }
+   }
 
    const loadPalettes = () => {
       const chosenPalettes = local.getItem('palettes');
@@ -475,7 +478,7 @@ export const useImage = () => {
             const blockX = remainingX > blockSize ? blockSize : remainingX;
             const blockY = remainingY > blockSize ? blockSize : remainingY;
             const averageColor = calculateAverageColor(context.current.getImageData(x, y, blockX, blockY));
-            const referenceColor = {
+            let referenceColor = {
                blue: averageColor.blue,
                green: averageColor.green,
                red: averageColor.red,
@@ -519,11 +522,6 @@ export const useImage = () => {
       return stats;
    };
 
-   const setImageFormHook = (hook = {}) => {
-      allow.anObject(hook);
-      imageFormHook = hook;
-   }
-
    const sortPalette = (stats = {}) => {
       allow.anObject(stats, is.not.empty);
 
@@ -553,6 +551,5 @@ export const useImage = () => {
       create,
       image,
       pixelate,
-      setImageFormHook,
    };
 };

@@ -15,12 +15,12 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { Home } from './routes/home/Home';
 import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
 import './ui.css';
 import './routes/css/baseProperties.css';
 import { About } from './routes/about/About';
+import { IndexContainer } from './routes/index/components/IndexContainer';
 
 const drawerWidth = 240;
 const navItems = ['Home', 'About'];
@@ -74,8 +74,8 @@ export const UI = props => {
                >
                   <MenuIcon/>
                   <span className={'marginLeft_24'}>
-                     Paint Map Studio
-                  </span>
+                  Paint Map Studio
+               </span>
                </IconButton>
                <Typography
                   component={'div'}
@@ -136,14 +136,14 @@ export const UI = props => {
                />
                <Route
                   element={
-                     <Home/>
+                     <IndexContainer/>
                   }
                   index={true}
                   path={'/'}
                />
                <Route
                   element={
-                     <Home/>}
+                     <IndexContainer/>}
                   path={'*'}
                />
             </Routes>

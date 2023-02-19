@@ -1,12 +1,14 @@
-import { useRef } from 'react';
+import { useRef, useContext } from 'react';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
+import { useImage } from './useImage';
+import { IndexState } from '../index/components/IndexContainer';
 
 export const useFile = () => {
    const blob = useRef(null);
    const file = useRef(null);
-   let imageHook;
-   let imageFormHook;
+   const image = useImage();
+   const indexState = useContext(IndexState);
 
    const handleFile = (event = {}) => {
       allow.anObject(event, is.not.empty);
@@ -14,48 +16,37 @@ export const useFile = () => {
    };
 
    const read = (chosenFile = {}) => {
-      imageFormHook.updateShowProcessing(true);
+      console.log('indexState', indexState);
+      indexState.setShowProcessing(true);
       const fileReader = new FileReader();
       fileReader.onloadend = event => {
          file.current = chosenFile;
          blob.current = event.target.result;
-         imageHook.create(blob.current);
+         image.create(blob.current);
       };
       try {
          fileReader.readAsDataURL(chosenFile);
       } catch (e) {
          // no file - do nothing
-         imageFormHook.updateShowProcessing(false);
+         indexState.setShowProcessing(false);
       }
    };
 
    const reload = () => {
       if (!blob.current || !file.current)
          return;
-      imageFormHook.updateShowProcessing(true);
+      indexState.setShowProcessing(true);
       const fileReader = new FileReader();
       fileReader.onloadend = () => {
-         imageHook.create(blob.current);
+         image.create(blob.current);
       };
       fileReader.readAsDataURL(file.current);
    };
-
-   const setImageFormHook = (hook = {}) => {
-      allow.anObject(hook, is.not.empty);
-      imageFormHook = hook;
-   }
-
-   const setImageHook = (hook = {}) => {
-      allow.anObject(hook, is.not.empty);
-      imageHook = hook;
-   }
 
    return {
       file,
       handleFile,
       read,
       reload,
-      setImageFormHook,
-      setImageHook,
    };
 };

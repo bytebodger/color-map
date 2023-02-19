@@ -6,26 +6,28 @@ import '../css/baseProperties.css';
 import { inputType } from '../objects/inputType';
 import { algorithm as algorithms } from '../objects/algorithm';
 import { Button, Select, MenuItem, Checkbox, OutlinedInput, ListItemText, InputLabel, FormControl, FormGroup, FormControlLabel, Modal, CircularProgress, Backdrop } from '@mui/material';
-import { useRef, useState } from 'react';
+import { useRef, useState, useContext } from 'react';
 import { HelpTwoTone } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { useImageForm } from '../hooks/useImageForm';
+import { IndexState, getPaletteArray } from './components/IndexContainer';
+import { allow } from '@toolz/allow-react';
+import { is } from '../objects/is';
 import { useFile } from '../hooks/useFile';
-import { useImage } from '../hooks/useImage';
+import { local } from '@toolz/local-storage';
 
 const style = {
-   position: 'absolute',
-   top: '50%',
-   left: '50%',
-   transform: 'translate(-50%, -50%)',
-   width: '50%',
    bgcolor: 'background.paper',
    boxShadow: 24,
+   left: '50%',
    p: 4,
+   position: 'absolute',
+   top: '50%',
+   transform: 'translate(-50%, -50%)',
+   width: '50%',
 };
 
-export const Home = () => {
+export const Index = () => {
    const selectImageInputRef = useRef(null);
    const [algorithmModalOpen, setAlgorithmModalOpen] = useState(false);
    const [blockSizeModalOpen, setBlockSizeModalOpen] = useState(false);
@@ -35,13 +37,9 @@ export const Home = () => {
    const [minimumTresholdModalOpen, setMinimumThresholdModalOpen] = useState(false);
    const [palettesModalOpen, setPalettesModalOpen] = useState(false);
    const [selectImageModalOpen, setSelectImageModalOpen] = useState(false);
-   const imageForm = useImageForm();
+   const indexState = useContext(IndexState);
    const file = useFile();
-   const image = useImage();
-   imageForm.setFileHook(file);
-   file.setImageFormHook(imageForm);
-   file.setImageHook(image);
-   image.setImageFormHook(imageForm);
+
 
    const getAlgorithmOptions = () => {
       const options = [];
@@ -111,13 +109,28 @@ export const Home = () => {
       return options;
    };
 
-   const getPaletteList = () => imageForm.paletteList;
+   const getPaletteList = () => indexState.paletteList;
+
+   const handleAlgorithm = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {value} = event.target;
+      local.setItem('algorithm', value);
+      indexState.setAlgorithm(value, () => file.reload());
+   };
 
    const handleAlgorithmModalClosed = () => setAlgorithmModalOpen(false);
 
    const handleAlgorithmModalOpen = () => setAlgorithmModalOpen(true);
 
-   const handleBasePaintsMenuCheckbox = () => imageForm.handlePalettes('basePaints', !imageForm.palettes.basePaints);
+   const handleBasePaintsMenuCheckbox = () => handlePalettes('basePaints', !indexState.palettes.basePaints);
+
+   const handleBlockSize = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {value} = event.target;
+      const size = parseInt(value, 10);
+      local.setItem('blockSize', size);
+      indexState.setBlockSize(size, () => file.reload());
+   };
 
    const handleBlockSizeModalClosed = () => setBlockSizeModalOpen(false);
 
@@ -127,41 +140,87 @@ export const Home = () => {
 
    const handleColorDepthModalOpen = () => setColorDepthModalOpen(true);
 
+   const handleColorOrGreyscale = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {value} = event.target;
+      local.setItem('colorOrGreyscale', value);
+      indexState.setColorOrGreyscale(value, () => file.reload());
+   };
+
    const handleColorOrGreyscaleModalClosed = () => setColorOrGreyscaleModalOpen(false);
 
    const handleColorOrGreyscaleModalOpen = () => setColorOrGreyscaleModalOpen(true);
 
-   const handleHalfWhitesMenuCheckbox = () => imageForm.handlePalettes('halfWhites', !imageForm.palettes.halfWhites);
+   const handleFile = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const [source] = event.target.files;
+      file.read(source);
+   };
+
+   const handleHalfWhitesMenuCheckbox = () => handlePalettes('halfWhites', !indexState.palettes.halfWhites);
+
+   const handleMatchToPalette = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {checked} = event.target;
+      local.setItem('matchToPalette', checked);
+      indexState.setMatchToPalette(checked, () => file.reload());
+   };
 
    const handleMatchToPaletteModalClosed = () => setMatchToPaletteModalOpen(false);
 
    const handleMatchToPaletteModalOpen = () => setMatchToPaletteModalOpen(true);
 
+   const handleMaximumColors = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {value} = event.target;
+      const maximum = parseInt(value, 10);
+      local.setItem('maximumColors', maximum);
+      indexState.setMaximumColors(maximum, () => file.reload());
+   };
+
+   const handleMinimumThreshold = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {value} = event.target;
+      const minimum = parseInt(value, 10);
+      local.setItem('minimumThreshold', minimum);
+      indexState.setMinimumThreshold(minimum, () => file.reload());
+   }
+
    const handleMinimumThresholdModalClosed = () => setMinimumThresholdModalOpen(false);
 
    const handleMinimumThresholdModalOpen = () => setMinimumThresholdModalOpen(true);
+
+   const handlePalettes = (key = '', value = false) => {
+      allow.aString(key, is.not.empty).aBoolean(value);
+      const newPalettes = {...indexState.palettes};
+      newPalettes[key] = value;
+      local.setItem('palettes', newPalettes);
+      indexState.setPaletteArray(getPaletteArray());
+      indexState.setPaletteList(getPaletteList());
+      indexState.setPalettes(newPalettes, () => file.reload());
+   };
 
    const handlePalettesModalClosed = () => setPalettesModalOpen(false);
 
    const handlePalettesModalOpen = () => setPalettesModalOpen(true);
 
-   const handleQuarterWhitesMenuCheckbox = () => imageForm.handlePalettes('quarterWhites', !imageForm.palettes.quarterWhites);
+   const handleQuarterWhitesMenuCheckbox = () => handlePalettes('quarterWhites', !indexState.palettes.quarterWhites);
 
    const handleSelectImageModalClosed = () => setSelectImageModalOpen(false);
 
    const handleSelectImageModalOpen = () => setSelectImageModalOpen(true);
 
-   const handleThirdWhitesMenuCheckbox = () => imageForm.handlePalettes('thirdWhites', !imageForm.palettes.thirdWhites);
+   const handleThirdWhitesMenuCheckbox = () => handlePalettes('thirdWhites', !indexState.palettes.thirdWhites);
 
    const handleImageButton = () => selectImageInputRef.current && selectImageInputRef.current.click();
 
    return <>
       <Backdrop
          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-         open={imageForm.showProcessing}
+         open={indexState.showProcessing}
       >
          <div className={'textAlignCenter'}>
-            <CircularProgress color="inherit"/>
+            <CircularProgress color={'inherit'}/>
             <br/>
             Image Processing...
          </div>
@@ -394,7 +453,7 @@ export const Home = () => {
                   <input
                      accept={'image/*'}
                      className={'displayNone'}
-                     onChange={imageForm.handleFile}
+                     onChange={handleFile}
                      ref={selectImageInputRef}
                      type={inputType.file}
                   />
@@ -424,9 +483,9 @@ export const Home = () => {
                         input={
                            <OutlinedInput label={'Block Size'}/>}
                         labelId={'block-size-label'}
-                        onChange={imageForm.handleBlockSize}
+                        onChange={handleBlockSize}
                         size={'small'}
-                        value={imageForm.blockSize}
+                        value={indexState.blockSize}
                      >
                         {getBlockSizeOptions()}
                      </Select>
@@ -441,7 +500,7 @@ export const Home = () => {
                <Column>
                   <FormGroup sx={{float: 'left', marginLeft: 1}}>
                      <FormControlLabel
-                        control={<Checkbox checked={imageForm.matchToPalette} onChange={imageForm.handleMatchToPalette}/>}
+                        control={<Checkbox checked={indexState.matchToPalette} onChange={handleMatchToPalette}/>}
                         label={'Match to Palette'}
                      />
                   </FormGroup>
@@ -455,7 +514,7 @@ export const Home = () => {
          <Column>
             <Row
                className={'marginBottom_8'}
-               style={{visibility: imageForm.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
+               style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
                <Column>
                   <FormControl sx={{m: 1, width: 300}}>
@@ -469,9 +528,9 @@ export const Home = () => {
                         input={
                            <OutlinedInput label={'Color Depth'}/>}
                         labelId={'color-depth-label'}
-                        onChange={imageForm.handleMaximumColors}
+                        onChange={handleMaximumColors}
                         size={'small'}
-                        value={imageForm.maximumColors}
+                        value={indexState.maximumColors}
                      >
                         {getMaximumColorsOptions()}
                      </Select>
@@ -484,7 +543,7 @@ export const Home = () => {
             </Row>
             <Row
                className={'marginBottom_8'}
-               style={{visibility: imageForm.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
+               style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
                <Column>
                   <FormControl sx={{m: 1, width: 300}}>
@@ -498,9 +557,9 @@ export const Home = () => {
                         input={
                            <OutlinedInput label={'Minimum Threshold'}/>}
                         labelId={'minimum-threshold-label'}
-                        onChange={imageForm.handleMinimumThreshold}
+                        onChange={handleMinimumThreshold}
                         size={'small'}
-                        value={imageForm.minimumThreshold}
+                        value={indexState.minimumThreshold}
                      >
                         {getMinimumThresholdOptions()}
                      </Select>
@@ -513,7 +572,7 @@ export const Home = () => {
             </Row>
             <Row
                className={'marginBottom_8'}
-               style={{visibility: imageForm.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
+               style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
                <Column>
                   <FormControl sx={{m: 1, width: 300}}>
@@ -527,9 +586,9 @@ export const Home = () => {
                         input={
                            <OutlinedInput label={'Algorithm'}/>}
                         labelId={'algorithm-label'}
-                        onChange={imageForm.handleAlgorithm}
+                        onChange={handleAlgorithm}
                         size={'small'}
-                        value={imageForm.algorithm}
+                        value={indexState.algorithm}
                      >
                         {getAlgorithmOptions()}
                      </Select>
@@ -542,7 +601,7 @@ export const Home = () => {
             </Row>
             <Row
                className={'marginBottom_8'}
-               style={{visibility: imageForm.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
+               style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
                <Column>
                   <FormControl sx={{m: 1, width: 300}}>
@@ -556,9 +615,9 @@ export const Home = () => {
                         input={
                            <OutlinedInput label={'Color/Greyscale'}/>}
                         labelId={'color/greyscale-label'}
-                        onChange={imageForm.handleColorOrGreyscale}
+                        onChange={handleColorOrGreyscale}
                         size={'small'}
-                        value={imageForm.colorOrGreyscale}
+                        value={indexState.colorOrGreyscale}
                      >
                         <MenuItem value={'color'}>Color</MenuItem>
                         <MenuItem value={'greyscale'}>Greyscale</MenuItem>
@@ -570,7 +629,7 @@ export const Home = () => {
                   />
                </Column>
             </Row>
-            <Row style={{visibility: imageForm.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}>
+            <Row style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}>
                <Column>
                   <FormControl sx={{m: 1, width: 300}}>
                      <InputLabel
@@ -586,22 +645,22 @@ export const Home = () => {
                         multiple={true}
                         renderValue={getPaletteList}
                         size={'small'}
-                        value={imageForm.paletteArray}
+                        value={indexState.paletteArray}
                      >
                         <MenuItem onClick={handleBasePaintsMenuCheckbox}>
-                           <Checkbox checked={imageForm.palettes.basePaints}/>
+                           <Checkbox checked={indexState.palettes.basePaints}/>
                            <ListItemText primary={'Heavy Body Acrylics'}/>
                         </MenuItem>
                         <MenuItem onClick={handleHalfWhitesMenuCheckbox}>
-                           <Checkbox checked={imageForm.palettes.halfWhites}/>
+                           <Checkbox checked={indexState.palettes.halfWhites}/>
                            <ListItemText primary={'Half-Whites'}/>
                         </MenuItem>
                         <MenuItem onClick={handleThirdWhitesMenuCheckbox}>
-                           <Checkbox checked={imageForm.palettes.thirdWhites}/>
+                           <Checkbox checked={indexState.palettes.thirdWhites}/>
                            <ListItemText primary={'Third-Whites'}/>
                         </MenuItem>
                         <MenuItem onClick={handleQuarterWhitesMenuCheckbox}>
-                           <Checkbox checked={imageForm.palettes.quarterWhites}/>
+                           <Checkbox checked={indexState.palettes.quarterWhites}/>
                            <ListItemText primary={'Quarter-Whites'}/>
                         </MenuItem>
                      </Select>
