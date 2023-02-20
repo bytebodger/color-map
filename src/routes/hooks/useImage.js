@@ -19,8 +19,8 @@ export const useImage = () => {
    let palette = [];
    let totalBlocks;
    let blocksProcessed;
-   let currentProgress;
    let previousProgress;
+   let currentProgress;
 
    useEffect(() => {
       canvas.current = document.getElementById('canvas');
@@ -277,11 +277,11 @@ export const useImage = () => {
    };
 
    const create = (src = '') => {
-      allow.aString(src);
       const source = src === '' ? image.current.src : src;
       const newImage = new Image();
       newImage.src = source;
       newImage.onload = () => {
+         indexState.setShowProcessing(false);
          image.current = newImage;
          canvas.current.width = newImage.width;
          canvas.current.height = newImage.height;
@@ -294,7 +294,7 @@ export const useImage = () => {
             adjustColorDepth(stats);
          else
             indexState.setShowProcessing(false);
-      };
+      }
       return newImage;
    };
 
@@ -507,12 +507,12 @@ export const useImage = () => {
             context.current.fillStyle = `rgb(${closestColor.red}, ${closestColor.green}, ${closestColor.blue})`;
             context.current.fillRect(x, y, blockX, blockY);
             blocksProcessed++;
-            currentProgress = Math.ceil((blocksProcessed / totalBlocks) * 100);
-            if (currentProgress !== previousProgress && currentProgress % 5 === 0) {
-               console.log(`${currentProgress}% complete`);
-            }
-            previousProgress = currentProgress;
          }
+         currentProgress = Math.ceil((blocksProcessed / totalBlocks) * 100);
+         if (currentProgress !== previousProgress && currentProgress % 5 === 0) {
+            console.log(`${currentProgress}% complete`);
+         }
+         previousProgress = currentProgress;
          stats.map.push(row);
       }
       if (matchToPalette)
@@ -549,7 +549,6 @@ export const useImage = () => {
 
    return {
       create,
-      image,
       pixelate,
    };
 };

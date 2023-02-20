@@ -4,7 +4,6 @@ import { css3 } from '@toolz/css3/src/css3';
 import './css/home.css';
 import '../css/baseProperties.css';
 import { inputType } from '../objects/inputType';
-import { algorithm as algorithms } from '../objects/algorithm';
 import { Button, Select, MenuItem, Checkbox, OutlinedInput, ListItemText, InputLabel, FormControl, FormGroup, FormControlLabel, Modal, CircularProgress, Backdrop } from '@mui/material';
 import { useRef, useState, useContext } from 'react';
 import { HelpTwoTone } from '@mui/icons-material';
@@ -13,8 +12,9 @@ import Typography from '@mui/material/Typography';
 import { IndexState, getPaletteArray } from './components/IndexContainer';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
-import { useFile } from '../hooks/useFile';
 import { local } from '@toolz/local-storage';
+import { useFile } from '../hooks/useFile';
+import { algorithm as algorithms } from '../objects/algorithm';
 
 const style = {
    bgcolor: 'background.paper',
@@ -27,7 +27,7 @@ const style = {
    width: '50%',
 };
 
-export const Index = () => {
+export const Index = props => {
    const selectImageInputRef = useRef(null);
    const [algorithmModalOpen, setAlgorithmModalOpen] = useState(false);
    const [blockSizeModalOpen, setBlockSizeModalOpen] = useState(false);
@@ -39,7 +39,6 @@ export const Index = () => {
    const [selectImageModalOpen, setSelectImageModalOpen] = useState(false);
    const indexState = useContext(IndexState);
    const file = useFile();
-
 
    const getAlgorithmOptions = () => {
       const options = [];

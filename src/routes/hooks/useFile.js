@@ -16,7 +16,6 @@ export const useFile = () => {
    };
 
    const read = (chosenFile = {}) => {
-      console.log('indexState', indexState);
       indexState.setShowProcessing(true);
       const fileReader = new FileReader();
       fileReader.onloadend = event => {

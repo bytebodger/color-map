@@ -74,8 +74,8 @@ export const UI = props => {
                >
                   <MenuIcon/>
                   <span className={'marginLeft_24'}>
-                  Paint Map Studio
-               </span>
+               Paint Map Studio
+            </span>
                </IconButton>
                <Typography
                   component={'div'}
