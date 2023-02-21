@@ -349,7 +349,7 @@ export const Index = () => {
                sx={{ mt: 2, textAlign: 'justify' }}
             >
                Minimum Threshold is another way to limit the number of colors that exist in the processed image.  Once the image is processed, its colors
-               will be sorted by frequency and color that occurs fewer times than the Minimum Threshold will be replaced with its closest match from the
+               will be sorted by frequency and any color that occurs fewer times than the Minimum Threshold will be replaced with its closest match from the
                rest of the colors.
             </Typography>
          </Box>
