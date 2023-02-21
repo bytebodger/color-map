@@ -1,8 +1,8 @@
 import { Index } from '../Index';
 import { createContext, useState } from 'react';
 import { local } from '@toolz/local-storage';
-import { algorithm as algorithms } from '../../objects/algorithm';
-import { useStateWithCallback } from '../../hooks/useStateWithCallback';
+import { algorithm as algorithms } from '../../../common/objects/algorithm';
+import { useStateWithCallback } from '../../../common/hooks/useStateWithCallback';
 
 export const IndexState = createContext({});
 
@@ -14,15 +14,19 @@ export const getPaletteArray = () => {
 export const getPaletteList = () => {
    const translation = {
       basePaints: 'Heavy Body Acrylics',
-      halfWhites: 'Half-Whites',
-      thirdWhites: 'Third-Whites',
-      quarterWhites: 'Quarter-Whites',
+      quarterWhites: '1/4 Whites',
+      thirdWhites: '1/3 Whites',
+      halfWhites: '1/2 Whites',
+      twoThirdWhites: '2/3 Whites',
+      threeQuarterWhites: '3/4 Whites',
    }
    const palettes = local.getItem('palettes', {
       basePaints: true,
-      halfWhites: false,
-      thirdWhites: false,
       quarterWhites: false,
+      thirdWhites: false,
+      halfWhites: false,
+      twoThirdWhites: false,
+      threeQuarterWhites: false,
    });
    let paletteList = [];
    Object.entries(palettes).forEach(entry => {

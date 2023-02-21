@@ -3,12 +3,11 @@ import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
 import { algorithm as algorithms } from '../objects/algorithm';
 import { rgbModel } from '../objects/models/rgbModel';
-import { local } from '@toolz/local-storage';
 import { palettes } from '../arrays/palettes';
 import { xyzModel } from '../objects/models/xyzModel';
 import { labModel } from '../objects/models/labModel';
 import { cmykModel } from '../objects/models/cmykModel';
-import { IndexState } from '../index/components/IndexContainer';
+import { IndexState } from '../../routes/index/components/IndexContainer';
 
 export const useImage = () => {
    const canvas = useRef(null);
@@ -34,8 +33,7 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
-      const algorithm = local.getItem('algorithm');
-      const blockSize = local.getItem('blockSize');
+      const { algorithm, blockSize } = indexState;
       palette = filterPalette(stats);
       for (let y = 0; y < imageData.height; y += blockSize) {
          const row = [];
@@ -101,7 +99,7 @@ export const useImage = () => {
       };
    };
 
-   const calculateDeltaE00 = (labColor1 = labModel, labColor2 = labModel) => {
+   const calculateDeltaE2000 = (labColor1 = labModel, labColor2 = labModel) => {
       allow.anInstanceOf(labColor1, labModel).anInstanceOf(labColor2, labModel);
       const {lightness: lightness1, redGreen: redGreen1, blueYellow: blueYellow1} = labColor1;
       const {lightness: lightness2, redGreen: redGreen2, blueYellow: blueYellow2} = labColor2;
@@ -185,9 +183,10 @@ export const useImage = () => {
       let magenta = 255 - green;
       let yellow = 255 - blue;
       let key = Math.min(cyan, magenta, yellow);
-      cyan = ((cyan - key) / (255 - key));
-      magenta = ((magenta - key) / (255 - key));
-      yellow = ((yellow - key) / (255 - key));
+      const divider = key === 255 ? 1 : 255 - key;
+      cyan = ((cyan - key) / divider);
+      magenta = ((magenta - key) / divider);
+      yellow = ((yellow - key) / divider);
       key = key / 255;
       return {
          cyan,
@@ -288,8 +287,7 @@ export const useImage = () => {
          context.current = canvas.current.getContext('2d', {alpha: false, willReadFrequently: true});
          context.current.drawImage(newImage, 0, 0);
          const stats = pixelate();
-         const matchToPalette = local.getItem('matchToPalette');
-         const maximumColors = local.getItem('maximumColors');
+         const { matchToPalette, maximumColors } = indexState;
          if (matchToPalette && maximumColors !== 0)
             adjustColorDepth(stats);
          else
@@ -322,7 +320,7 @@ export const useImage = () => {
          red: -1,
       };
       let shortestDistance = Number.MAX_SAFE_INTEGER;
-      const algorithm = local.getItem('algorithm');
+      const { algorithm } = indexState;
       palette.forEach(paletteColor => {
          if (shortestDistance === 0)
             return;
@@ -346,7 +344,7 @@ export const useImage = () => {
             case algorithms.DELTA_E:
                const paletteLabColor = convertRgbToLab(paletteColor);
                const referenceLabColor = convertRgbToLab(referenceColor);
-               distance = calculateDeltaE00(paletteLabColor, referenceLabColor);
+               distance = calculateDeltaE2000(paletteLabColor, referenceLabColor);
                break;
             case algorithms.RGB:
             default:
@@ -364,11 +362,6 @@ export const useImage = () => {
       return closestColor;
    };
 
-   const getPixelIndex = (x = -1, y = -1) => {
-      allow.anInteger(x, is.not.negative).anInteger(y, is.not.negative);
-      return ((image.current.width * y) + x) * 4;
-   };
-
    const getPixelFromImageData = (imageData = {}, x = -1, y = -1) => {
       allow.anObject(imageData).anInteger(x, is.not.negative).anInteger(y, is.not.negative);
       const index = getPixelIndex(x, y);
@@ -379,6 +372,11 @@ export const useImage = () => {
          x,
          y,
       };
+   };
+
+   const getPixelIndex = (x = -1, y = -1) => {
+      allow.anInteger(x, is.not.negative).anInteger(y, is.not.negative);
+      return ((image.current.width * y) + x) * 4;
    };
 
    const getRgbFromImageData = (imageData = {}, x = -1, y = -1) => {
@@ -396,7 +394,7 @@ export const useImage = () => {
    }
 
    const loadPalettes = () => {
-      const chosenPalettes = local.getItem('palettes');
+      const { palettes: chosenPalettes } = indexState;
       const white = {
          red: 255,
          green: 255,
@@ -407,26 +405,44 @@ export const useImage = () => {
          const [name, shouldLoad] = entry;
          if (!shouldLoad)
             return;
-         if (name === 'halfWhites') {
-            palettes.basePaints.forEach(paint => {
-               const mixed = mixRgbColorsSubtractively([paint, white]);
-               mixed.name = `${paint.name} (Half-White)`;
-               palette.push(mixed);
-            });
-         } else if (name === 'thirdWhites') {
-            palettes.basePaints.forEach(paint => {
-               const mixed = mixRgbColorsSubtractively([paint, paint, white]);
-               mixed.name = `${paint.name} (Third-White)`;
-               palette.push(mixed);
-            });
-         } else if (name === 'quarterWhites') {
-            palettes.basePaints.forEach(paint => {
-               const mixed = mixRgbColorsSubtractively([paint, paint, paint, white]);
-               mixed.name = `${paint.name} (Quarter-White)`;
-               palette.push(mixed);
-            });
-         } else {
-            palette = [...palette, ...palettes[name]];
+         switch (name) {
+            case 'quarterWhites':
+               palettes.basePaints.forEach(paint => {
+                  const mixed = mixRgbColorsSubtractively([paint, paint, paint, white]);
+                  mixed.name = `${paint.name} (1/4 White)`;
+                  palette.push(mixed);
+               });
+               break;
+            case 'thirdWhites':
+               palettes.basePaints.forEach(paint => {
+                  const mixed = mixRgbColorsSubtractively([paint, paint, white]);
+                  mixed.name = `${paint.name} (1/3 White)`;
+                  palette.push(mixed);
+               });
+               break;
+            case 'halfWhites':
+               palettes.basePaints.forEach(paint => {
+                  const mixed = mixRgbColorsSubtractively([paint, white]);
+                  mixed.name = `${paint.name} (1/2 White)`;
+                  palette.push(mixed);
+               });
+               break;
+            case 'twoThirdWhites':
+               palettes.basePaints.forEach(paint => {
+                  const mixed = mixRgbColorsSubtractively([paint, white, white]);
+                  mixed.name = `${paint.name} (2/3 White)`;
+                  palette.push(mixed);
+               });
+               break;
+            case 'threeQuarterWhites':
+               palettes.basePaints.forEach(paint => {
+                  const mixed = mixRgbColorsSubtractively([paint, white, white, white]);
+                  mixed.name = `${paint.name} (3/4 White)`;
+                  palette.push(mixed);
+               });
+               break;
+            default:
+               palette = [...palette, ...palettes[name]];
          }
       });
    };
@@ -461,10 +477,7 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
-      const algorithm = local.getItem('algorithm');
-      const blockSize = local.getItem('blockSize');
-      const colorOrGreyscale = local.getItem('colorOrGreyscale');
-      const matchToPalette = local.getItem('matchToPalette');
+      const { algorithm, blockSize, colorOrGreyscale, matchToPalette } = indexState;
       if (matchToPalette)
          loadPalettes();
       totalBlocks = Math.ceil(imageData.height / blockSize) * Math.ceil(imageData.width / blockSize);
@@ -539,8 +552,7 @@ export const useImage = () => {
       const colorCounts = [];
       Object.entries(stats.colorCounts).forEach(colorCount => colorCounts.push(colorCount));
       colorCounts.sort(sort);
-      const maximumColors = local.getItem('maximumColors');
-      const minimumThreshold = local.getItem('minimumThreshold');
+      const { maximumColors, minimumThreshold } = indexState;
       return colorCounts.filter((colorCount, index) => {
          const [, count] = colorCount;
          return index < maximumColors && count >= minimumThreshold;
@@ -548,7 +560,9 @@ export const useImage = () => {
    };
 
    return {
+      convertRgbToCmyk,
       create,
+      mixRgbColorsSubtractively,
       pixelate,
    };
 };

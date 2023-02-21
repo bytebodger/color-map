@@ -2,7 +2,7 @@ import { useRef, useContext } from 'react';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
 import { useImage } from './useImage';
-import { IndexState } from '../index/components/IndexContainer';
+import { IndexState } from '../../routes/index/components/IndexContainer';
 
 export const useFile = () => {
    const blob = useRef(null);

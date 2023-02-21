@@ -18,12 +18,13 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
 import './ui.css';
-import './routes/css/baseProperties.css';
+import './common/css/baseProperties.css';
 import { About } from './routes/about/About';
 import { IndexContainer } from './routes/index/components/IndexContainer';
+import { Palettes } from './routes/palettes/Palettes';
 
 const drawerWidth = 240;
-const navItems = ['Home', 'About'];
+const navItems = ['Home', 'Palettes', 'About'];
 
 export const UI = props => {
    const {window} = props;
@@ -145,6 +146,11 @@ export const UI = props => {
                   element={
                      <IndexContainer/>}
                   path={'*'}
+               />
+               <Route
+                  element={
+                     <Palettes/>}
+                  path={'/palettes'}
                />
             </Routes>
             <div className={'marginTop_20'}>

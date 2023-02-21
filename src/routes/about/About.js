@@ -2,7 +2,7 @@ import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
 import Typography from '@mui/material/Typography';
 import './css/about.css';
-import '../css/baseProperties.css';
+import '../../common/css/baseProperties.css';
 
 export const About = () => {
    return <>

@@ -2,8 +2,8 @@ import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
 import { css3 } from '@toolz/css3/src/css3';
 import './css/home.css';
-import '../css/baseProperties.css';
-import { inputType } from '../objects/inputType';
+import '../../common/css/baseProperties.css';
+import { inputType } from '../../common/objects/inputType';
 import { Button, Select, MenuItem, Checkbox, OutlinedInput, ListItemText, InputLabel, FormControl, FormGroup, FormControlLabel, Modal, CircularProgress, Backdrop } from '@mui/material';
 import { useRef, useState, useContext } from 'react';
 import { HelpTwoTone } from '@mui/icons-material';
@@ -11,10 +11,11 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { IndexState, getPaletteArray } from './components/IndexContainer';
 import { allow } from '@toolz/allow-react';
-import { is } from '../objects/is';
+import { is } from '../../common/objects/is';
 import { local } from '@toolz/local-storage';
-import { useFile } from '../hooks/useFile';
-import { algorithm as algorithms } from '../objects/algorithm';
+import { useFile } from '../../common/hooks/useFile';
+import { algorithm as algorithms } from '../../common/objects/algorithm';
+import { getPaletteList } from './components/IndexContainer';
 
 const style = {
    bgcolor: 'background.paper',
@@ -27,7 +28,7 @@ const style = {
    width: '50%',
 };
 
-export const Index = props => {
+export const Index = () => {
    const selectImageInputRef = useRef(null);
    const [algorithmModalOpen, setAlgorithmModalOpen] = useState(false);
    const [blockSizeModalOpen, setBlockSizeModalOpen] = useState(false);
@@ -80,7 +81,7 @@ export const Index = props => {
             Unlimited
          </MenuItem>,
       );
-      for (let i = 250; i >= 20; i--) {
+      for (let i = 250; i >= 20; i -= 5) {
          options.push(
             <MenuItem
                key={`maximumColors-${i}`}
@@ -107,8 +108,6 @@ export const Index = props => {
       }
       return options;
    };
-
-   const getPaletteList = () => indexState.paletteList;
 
    const handleAlgorithm = (event = {}) => {
       allow.anObject(event, is.not.empty);
@@ -210,6 +209,10 @@ export const Index = props => {
    const handleSelectImageModalOpen = () => setSelectImageModalOpen(true);
 
    const handleThirdWhitesMenuCheckbox = () => handlePalettes('thirdWhites', !indexState.palettes.thirdWhites);
+
+   const handleThreeQuarterWhitesMenuCheckbox = () => handlePalettes('threeQuarterWhites', !indexState.palettes.threeQuarterWhites);
+
+   const handleTwoThirdWhitesMenuCheckbox = () => handlePalettes('twoThirdWhites', !indexState.palettes.twoThirdWhites);
 
    const handleImageButton = () => selectImageInputRef.current && selectImageInputRef.current.click();
 
@@ -433,11 +436,12 @@ export const Index = props => {
                <br/><br/>
                However, the "base" heavy body acrylic paints are quite dark.  And if you <i>only</i> select the Heavy Body Acrylics palette,
                you may find that the algorithm has a hard time finding a suitable match for the lighter colors in your source image.  For this
-               reason, you also have the option to select Half-White, Third-White, and Quarter-White palettes.
+               reason, you also have the option to select 1/4 White, 1/3 White, 1/2 White, 2/3 White, and 3/4 White palettes.
                <br/><br/>
-               The Half-White palette consists of all the original colors in Heavy Body Acrylics mixed half-and-half with white.  Third-White
-               represents two parts of each original Heavy Body Acrylics color mixed with one part of white.  And finally, Quarter-White represents
-               three parts of each original Heavy Body Acrylics color mixed with one part of white.
+               The 1/4 White palette consists of 3 parts of the original color and 1 part of pure white.  1/3 White consists of 2 parts 
+               of the original color and 1 part of pure white.  1/2 White consists of 1 part of the original color and 1 part of pure 
+               white.  2/3 White consists of 1 part of the original color and 2 parts of pure white.  3/4 White consists of 1 part of 
+               the original color and 3 parts of pure white.
                <br/><br/>
                Expanding the number of available palettes will make the resuling image more closely resemble the source file - but it will
                also mean that you need to mix more paints to bring that image to a canvas.  However, this problem can me mitigated by using the
@@ -650,17 +654,25 @@ export const Index = props => {
                            <Checkbox checked={indexState.palettes.basePaints}/>
                            <ListItemText primary={'Heavy Body Acrylics'}/>
                         </MenuItem>
-                        <MenuItem onClick={handleHalfWhitesMenuCheckbox}>
-                           <Checkbox checked={indexState.palettes.halfWhites}/>
-                           <ListItemText primary={'Half-Whites'}/>
+                        <MenuItem onClick={handleQuarterWhitesMenuCheckbox}>
+                           <Checkbox checked={indexState.palettes.quarterWhites}/>
+                           <ListItemText primary={'1/4 Whites'}/>
                         </MenuItem>
                         <MenuItem onClick={handleThirdWhitesMenuCheckbox}>
                            <Checkbox checked={indexState.palettes.thirdWhites}/>
-                           <ListItemText primary={'Third-Whites'}/>
+                           <ListItemText primary={'1/3 Whites'}/>
                         </MenuItem>
-                        <MenuItem onClick={handleQuarterWhitesMenuCheckbox}>
-                           <Checkbox checked={indexState.palettes.quarterWhites}/>
-                           <ListItemText primary={'Quarter-Whites'}/>
+                        <MenuItem onClick={handleHalfWhitesMenuCheckbox}>
+                           <Checkbox checked={indexState.palettes.halfWhites}/>
+                           <ListItemText primary={'1/2 Whites'}/>
+                        </MenuItem>
+                        <MenuItem onClick={handleTwoThirdWhitesMenuCheckbox}>
+                           <Checkbox checked={indexState.palettes.twoThirdWhites}/>
+                           <ListItemText primary={'2/3 Whites'}/>
+                        </MenuItem>
+                        <MenuItem onClick={handleThreeQuarterWhitesMenuCheckbox}>
+                           <Checkbox checked={indexState.palettes.threeQuarterWhites}/>
+                           <ListItemText primary={'3/4 Whites'}/>
                         </MenuItem>
                      </Select>
                   </FormControl>
