@@ -13,7 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useState, createContext } from 'react';
+import { useState, createContext, useRef } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
@@ -35,6 +35,8 @@ export const UI = props => {
    const [showCanvas, setShowCanvas] = useState(false);
    const [showStatsLink, setShowStatsLink] = useState(false);
    const [stats, setStats] = useState({});
+   const blob = useRef(null);
+   const file = useRef(null);
    const navigateTo = useNavigate();
 
    const container = window !== undefined ? () => window().document.body : undefined;
@@ -78,6 +80,8 @@ export const UI = props => {
 
    return <>
       <UIState.Provider value={{
+         blob,
+         file,
          setShowCanvas,
          setShowStatsLink,
          setStats,

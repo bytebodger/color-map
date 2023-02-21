@@ -1,14 +1,14 @@
-import { useRef, useContext } from 'react';
+import { useContext } from 'react';
 import { allow } from '@toolz/allow-react';
 import { is } from '../objects/is';
 import { useImage } from './useImage';
 import { IndexState } from '../../routes/index/components/IndexContainer';
+import { UIState } from '../../UI';
 
 export const useFile = () => {
-   const blob = useRef(null);
-   const file = useRef(null);
    const image = useImage();
    const indexState = useContext(IndexState);
+   const uiState = useContext(UIState);
 
    const handleFile = (event = {}) => {
       allow.anObject(event, is.not.empty);
@@ -19,9 +19,9 @@ export const useFile = () => {
       indexState.setShowProcessing(true);
       const fileReader = new FileReader();
       fileReader.onloadend = event => {
-         file.current = chosenFile;
-         blob.current = event.target.result;
-         image.create(blob.current);
+         uiState.file.current = chosenFile;
+         uiState.blob.current = event.target.result;
+         image.create(uiState.blob.current);
       };
       try {
          fileReader.readAsDataURL(chosenFile);
@@ -32,18 +32,17 @@ export const useFile = () => {
    };
 
    const reload = () => {
-      if (!blob.current || !file.current)
+      if (!uiState.blob.current || !uiState.file.current)
          return;
       indexState.setShowProcessing(true);
       const fileReader = new FileReader();
       fileReader.onloadend = () => {
-         image.create(blob.current);
+         image.create(uiState.blob.current);
       };
-      fileReader.readAsDataURL(file.current);
+      fileReader.readAsDataURL(uiState.file.current);
    };
 
    return {
-      file,
       handleFile,
       read,
       reload,
