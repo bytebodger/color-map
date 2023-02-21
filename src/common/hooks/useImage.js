@@ -9,6 +9,7 @@ import { labModel } from '../objects/models/labModel';
 import { cmykModel } from '../objects/models/cmykModel';
 import { IndexState } from '../../routes/index/components/IndexContainer';
 import { UIState } from '../../UI';
+import { local } from '@toolz/local-storage';
 
 export const useImage = () => {
    const canvas = useRef(null);
@@ -35,7 +36,8 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
-      const { algorithm, blockSize } = indexState;
+      const algorithm = local.getItem('algorithm');
+      const blockSize = local.getItem('blockSize');
       palette = filterPalette(stats);
       for (let y = 0; y < imageData.height; y += blockSize) {
          const row = [];
@@ -289,13 +291,14 @@ export const useImage = () => {
          context.current = canvas.current.getContext('2d', {alpha: false, willReadFrequently: true});
          context.current.drawImage(newImage, 0, 0);
          let stats = pixelate();
-         const { matchToPalette, maximumColors } = indexState;
+         const matchToPalette = local.getItem('matchToPalette');
+         const maximumColors = local.getItem('maximumColors');
          if (matchToPalette && maximumColors !== 0)
             stats = adjustColorDepth(stats);
          else
             indexState.setShowProcessing(false);
          uiState.setStats(stats);
-         uiState.setShowStatsLink(true);
+         uiState.setShowStatsLink(matchToPalette);
       }
       return newImage;
    };
@@ -324,7 +327,7 @@ export const useImage = () => {
          red: -1,
       };
       let shortestDistance = Number.MAX_SAFE_INTEGER;
-      const { algorithm } = indexState;
+      const algorithm = local.getItem('algorithm');
       palette.forEach(paletteColor => {
          if (shortestDistance === 0)
             return;
@@ -398,7 +401,7 @@ export const useImage = () => {
    }
 
    const loadPalettes = () => {
-      const { palettes: chosenPalettes } = indexState;
+      const chosenPalettes = local.getItem('palettes');
       const white = {
          red: 255,
          green: 255,
@@ -481,7 +484,10 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
-      const { algorithm, blockSize, colorOrGreyscale, matchToPalette } = indexState;
+      const algorithm = local.getItem('algorithm');
+      const blockSize = local.getItem('blockSize');
+      const colorOrGreyscale = local.getItem('colorOrGreyscale');
+      const matchToPalette = local.getItem('matchToPalette');
       if (matchToPalette)
          loadPalettes();
       totalBlocks = Math.ceil(imageData.height / blockSize) * Math.ceil(imageData.width / blockSize);
@@ -556,7 +562,8 @@ export const useImage = () => {
       const colorCounts = [];
       Object.entries(stats.colorCounts).forEach(colorCount => colorCounts.push(colorCount));
       colorCounts.sort(sort);
-      const { maximumColors, minimumThreshold } = indexState;
+      const maximumColors = local.getItem('maximumColors');
+      const minimumThreshold = local.getItem('minimumThreshold');
       return colorCounts.filter((colorCount, index) => {
          const [, count] = colorCount;
          return index < maximumColors && count >= minimumThreshold;
