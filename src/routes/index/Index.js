@@ -386,7 +386,7 @@ export const Index = () => {
                <br/><br/>
                <b>Delta-E 2000:</b> This is a formula, first developed in the 1970s, based on the L*a*b* colorspace.  Like the approaches detailed
                above, it's designed to represent the "difference" between two colors with a single numeric value.  However, this formula is
-               considered to be more accurate and fewer oddities where two "close" colors look very different to the human eye.
+               considered to be more accurate with fewer oddities where two "close" colors look very different to the human eye.
             </Typography>
          </Box>
       </Modal>
