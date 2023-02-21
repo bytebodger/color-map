@@ -8,12 +8,14 @@ import { xyzModel } from '../objects/models/xyzModel';
 import { labModel } from '../objects/models/labModel';
 import { cmykModel } from '../objects/models/cmykModel';
 import { IndexState } from '../../routes/index/components/IndexContainer';
+import { UIState } from '../../UI';
 
 export const useImage = () => {
    const canvas = useRef(null);
    const context = useRef(null);
    const image = useRef(null);
    const indexState = useContext(IndexState);
+   const uiState = useContext(UIState);
    let closestColors = {};
    let palette = [];
    let totalBlocks;
@@ -286,12 +288,14 @@ export const useImage = () => {
          canvas.current.height = newImage.height;
          context.current = canvas.current.getContext('2d', {alpha: false, willReadFrequently: true});
          context.current.drawImage(newImage, 0, 0);
-         const stats = pixelate();
+         let stats = pixelate();
          const { matchToPalette, maximumColors } = indexState;
          if (matchToPalette && maximumColors !== 0)
-            adjustColorDepth(stats);
+            stats = adjustColorDepth(stats);
          else
             indexState.setShowProcessing(false);
+         uiState.setStats(stats);
+         uiState.setShowStatsLink(true);
       }
       return newImage;
    };

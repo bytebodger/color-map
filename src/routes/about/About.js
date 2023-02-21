@@ -3,8 +3,17 @@ import { Column } from '@toolz/material-ui/dist/components/Column';
 import Typography from '@mui/material/Typography';
 import './css/about.css';
 import '../../common/css/baseProperties.css';
+import { useContext, useEffect } from 'react';
+import { UIState } from '../../UI';
 
 export const About = () => {
+   const uiState = useContext(UIState);
+
+   useEffect(() => {
+      if (uiState.showCanvas)
+         uiState.setShowCanvas(false);
+   });
+
    return <>
       <Row>
          <Column>

@@ -34,3 +34,12 @@
     position: relative;
     top: 16px;
 }
+
+.linkHelperPrompt {
+    color: #961175;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-left: 100px;
+    margin-top: 75px;
+    width: 500px;
+}

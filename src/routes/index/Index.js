@@ -5,7 +5,7 @@ import './css/home.css';
 import '../../common/css/baseProperties.css';
 import { inputType } from '../../common/objects/inputType';
 import { Button, Select, MenuItem, Checkbox, OutlinedInput, ListItemText, InputLabel, FormControl, FormGroup, FormControlLabel, Modal, CircularProgress, Backdrop } from '@mui/material';
-import { useRef, useState, useContext } from 'react';
+import { useRef, useState, useContext, useEffect } from 'react';
 import { HelpTwoTone } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,6 +16,7 @@ import { local } from '@toolz/local-storage';
 import { useFile } from '../../common/hooks/useFile';
 import { algorithm as algorithms } from '../../common/objects/algorithm';
 import { getPaletteList } from './components/IndexContainer';
+import { UIState } from '../../UI';
 
 const style = {
    bgcolor: 'background.paper',
@@ -39,7 +40,13 @@ export const Index = () => {
    const [palettesModalOpen, setPalettesModalOpen] = useState(false);
    const [selectImageModalOpen, setSelectImageModalOpen] = useState(false);
    const indexState = useContext(IndexState);
+   const uiState = useContext(UIState);
    const file = useFile();
+
+   useEffect(() => {
+      if (!uiState.showCanvas)
+         uiState.setShowCanvas(true);
+   });
 
    const getAlgorithmOptions = () => {
       const options = [];
@@ -682,6 +689,14 @@ export const Index = () => {
                   />
                </Column>
             </Row>
+         </Column>
+         <Column>
+            <div
+               className={'linkHelperPrompt'}
+               style={{display: uiState.showStatsLink ? css3.dislay.inherit : css3.dislay.none}}
+            >
+               You can now use the "Stats" link in the navbar above to get more info about the generated image.
+            </div>
          </Column>
       </Row>
    </>;

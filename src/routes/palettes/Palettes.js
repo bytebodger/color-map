@@ -6,9 +6,17 @@ import { is } from '../../common/objects/is';
 import { TableContainer, Paper, Table, TableBody, TableRow, TableCell } from '@mui/material';
 import { rgbModel } from '../../common/objects/models/rgbModel';
 import { useImage } from '../../common/hooks/useImage';
+import { useContext, useEffect } from 'react';
+import { UIState } from '../../UI';
 
 export const Palettes = () => {
+   const uiState = useContext(UIState);
    const image = useImage();
+
+   useEffect(() => {
+      if (uiState.showCanvas)
+         uiState.setShowCanvas(false);
+   });
 
    const paletteNames = [
       '',
