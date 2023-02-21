@@ -450,7 +450,7 @@ export const Index = () => {
                white.  2/3 White consists of 1 part of the original color and 2 parts of pure white.  3/4 White consists of 1 part of 
                the original color and 3 parts of pure white.
                <br/><br/>
-               Expanding the number of available palettes will make the resuling image more closely resemble the source file - but it will
+               Expanding the number of available palettes will make the resulting image more closely resemble the source file - but it will
                also mean that you need to mix more paints to bring that image to a canvas.  However, this problem can me mitigated by using the
                Color Depth and Minimum Threshold features.
             </Typography>
