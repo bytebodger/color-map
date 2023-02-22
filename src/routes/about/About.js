@@ -13,8 +13,9 @@ export const About = () => {
    useEffect(() => {
       if (uiState.showCanvas)
          uiState.setShowCanvas(false);
-      logGooglePageHit('about');
    });
+
+   useEffect(() => logGooglePageHit('about'), []);
 
    return <>
       <Row>

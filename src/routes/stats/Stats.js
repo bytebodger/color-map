@@ -25,8 +25,9 @@ export const Stats = () => {
       if (uiState.showCanvas)
          uiState.setShowCanvas(false);
       local.setItem('hasViewedMapOrStats', true);
-      logGooglePageHit('stats');
    });
+
+   useEffect(() => logGooglePageHit('stats'), []);
 
    const getColorCell = (paintName = '') => {
       allow.aString(paintName, is.not.empty);

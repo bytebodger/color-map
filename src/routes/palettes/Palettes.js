@@ -17,8 +17,9 @@ export const Palettes = () => {
    useEffect(() => {
       if (uiState.showCanvas)
          uiState.setShowCanvas(false);
-      logGooglePageHit('palettes');
    });
+
+   useEffect(() => logGooglePageHit('palettes'), []);
 
    const paletteNames = [
       '',

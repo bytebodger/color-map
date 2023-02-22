@@ -25,8 +25,9 @@ export const Map = () => {
       if (uiState.showCanvas)
          uiState.setShowCanvas(false);
       local.setItem('hasViewedMapOrStats', true);
-      logGooglePageHit('map');
    });
+
+   useEffect(() => logGooglePageHit('map'), []);
 
    const getTableCells = (cells = [rgbModel], rowIndex = -1) => {
       allow.anArrayOfInstances(cells, rgbModel).anInteger(rowIndex, is.not.negative);

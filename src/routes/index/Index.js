@@ -51,8 +51,9 @@ export const Index = () => {
    useEffect(() => {
       if (!uiState.showCanvas)
          uiState.setShowCanvas(true);
-      logGooglePageHit('index');
    });
+
+   useEffect(() => logGooglePageHit('index'), []);
 
    const getAlgorithmOptions = () => {
       const options = [];
