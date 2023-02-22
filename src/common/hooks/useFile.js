@@ -1,6 +1,4 @@
 import { useContext } from 'react';
-import { allow } from '@toolz/allow-react';
-import { is } from '../objects/is';
 import { useImage } from './useImage';
 import { IndexState } from '../../routes/index/components/IndexContainer';
 import { UIState } from '../../UI';
@@ -9,11 +7,6 @@ export const useFile = () => {
    const image = useImage();
    const indexState = useContext(IndexState);
    const uiState = useContext(UIState);
-
-   const handleFile = (event = {}) => {
-      allow.anObject(event, is.not.empty);
-      read(event.target.files[0]);
-   };
 
    const read = (chosenFile = {}) => {
       indexState.setShowProcessing(true);
@@ -43,7 +36,6 @@ export const useFile = () => {
    };
 
    return {
-      handleFile,
       read,
       reload,
    };

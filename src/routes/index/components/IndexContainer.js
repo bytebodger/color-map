@@ -42,8 +42,6 @@ export const IndexContainer = () => {
    const [algorithm, setAlgorithm] = useStateWithCallback(local.getItem('algorithm', algorithms.RGB));
    const [blockSize, setBlockSize] = useStateWithCallback(local.getItem('blockSize', 10));
    const [colorOrGreyscale, setColorOrGreyscale] = useStateWithCallback(local.getItem('colorOrGreyscale', 'color'));
-   const [currentFile, setCurrentFile] = useState(null);
-   const [imageSource, setImageSource] = useState(null);
    const [matchToPalette, setMatchToPalette] = useStateWithCallback(local.getItem('matchToPalette', false));
    const [maximumColors, setMaximumColors] = useStateWithCallback(local.getItem('maximumColors', 0));
    const [minimumThreshold, setMinimumThreshold] = useStateWithCallback(local.getItem('minimumThreshold', 5));
@@ -58,8 +56,6 @@ export const IndexContainer = () => {
          algorithm,
          blockSize,
          colorOrGreyscale,
-         currentFile,
-         imageSource,
          matchToPalette,
          maximumColors,
          minimumThreshold,
@@ -70,8 +66,6 @@ export const IndexContainer = () => {
          setAlgorithm,
          setBlockSize,
          setColorOrGreyscale,
-         setCurrentFile,
-         setImageSource,
          setMatchToPalette,
          setMaximumColors,
          setMinimumThreshold,

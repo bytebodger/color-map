@@ -97,9 +97,9 @@ export const useImage = () => {
          }
       }
       return {
-         red: redSum / redCounter,
-         green: greenSum / greenCounter,
-         blue: blueSum / blueCounter,
+         red: Math.round(redSum / redCounter),
+         green: Math.round(greenSum / greenCounter),
+         blue: Math.round(blueSum / blueCounter),
       };
    };
 
@@ -300,7 +300,6 @@ export const useImage = () => {
          uiState.setStats(stats);
          uiState.setShowPostImageLinks(matchToPalette);
       }
-      return newImage;
    };
 
    const filterPalette = (stats = {}) => {
@@ -514,13 +513,9 @@ export const useImage = () => {
                referenceColor.blue = darkness;
             }
             const closestColor = matchToPalette ? getClosestColorInThePalette(referenceColor) : averageColor;
-            row.push(closestColor);
-            if (!closestColor.name) {
-               closestColor.red = Math.round(closestColor.red);
-               closestColor.green = Math.round(closestColor.green);
-               closestColor.blue = Math.round(closestColor.green);
+            if (!closestColor.name)
                closestColor.name = `${closestColor.red}_${closestColor.green}_${closestColor.blue}`;
-            }
+            row.push(closestColor);
             if (Object.hasOwn(stats.colorCounts, closestColor.name))
                stats.colorCounts[closestColor.name]++;
             else {
