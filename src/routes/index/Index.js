@@ -17,6 +17,8 @@ import { useFile } from '../../common/hooks/useFile';
 import { algorithm as algorithms } from '../../common/objects/algorithm';
 import { getPaletteList } from './components/IndexContainer';
 import { UIState } from '../../UI';
+import { useNavigate } from 'react-router-dom';
+import { logGooglePageHit } from '../../common/functions/logGooglePageHit';
 
 const style = {
    bgcolor: 'background.paper',
@@ -35,6 +37,7 @@ export const Index = () => {
    const [blockSizeModalOpen, setBlockSizeModalOpen] = useState(false);
    const [colorDepthModalOpen, setColorDepthModalOpen] = useState(false);
    const [colorOrGreyscaleModalOpen, setColorOrGreyscaleModalOpen] = useState(false);
+   const [introModalOpen, setIntroModalOpen] = useState(!local.getItem('hasSeenIntroModal', false));
    const [matchToPaletteModalOpen, setMatchToPaletteModalOpen] = useState(false);
    const [minimumTresholdModalOpen, setMinimumThresholdModalOpen] = useState(false);
    const [palettesModalOpen, setPalettesModalOpen] = useState(false);
@@ -42,10 +45,13 @@ export const Index = () => {
    const indexState = useContext(IndexState);
    const uiState = useContext(UIState);
    const file = useFile();
+   const navigateTo = useNavigate();
+   const hasViewedMapOrStats = local.getItem('hasViewedMapOrStats', false);
 
    useEffect(() => {
       if (!uiState.showCanvas)
          uiState.setShowCanvas(true);
+      logGooglePageHit('index');
    });
 
    const getAlgorithmOptions = () => {
@@ -164,6 +170,11 @@ export const Index = () => {
 
    const handleHalfWhitesMenuCheckbox = () => handlePalettes('halfWhites', !indexState.palettes.halfWhites);
 
+   const handleIntroModalClosed = () => {
+      local.setItem('hasSeenIntroModal', true);
+      setIntroModalOpen(false);
+   }
+
    const handleMatchToPalette = (event = {}) => {
       allow.anObject(event, is.not.empty);
       const {checked} = event.target;
@@ -223,6 +234,10 @@ export const Index = () => {
 
    const handleImageButton = () => selectImageInputRef.current && selectImageInputRef.current.click();
 
+   const navigateToMap = () => navigateTo('/map');
+
+   const navigateToStats = () => navigateTo('/stats');
+
    return <>
       <Backdrop
          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -234,6 +249,30 @@ export const Index = () => {
             Image Processing...
          </div>
       </Backdrop>
+      <Modal
+         aria-describedby={'introModalDescription'}
+         aria-labelledby={'introModalTitle'}
+         onClose={handleIntroModalClosed}
+         open={introModalOpen}
+      >
+         <Box sx={style}>
+            <Typography
+               component={'h2'}
+               id={'introModalTitle'}
+               variant={'h6'}
+            >
+               Welcome to Paint Map Studio!
+            </Typography>
+            <Typography
+               id={'introModalDescription'}
+               sx={{ mt: 2, textAlign: 'justify' }}
+            >
+               This is a tool for translating colors from digital images into paint colors.  You can click around on the links in the
+               nav bar, or update the values in the form, but you won't see anything updating onscreen until you select a valid
+               image file from your system with the SELECT IMAGE button.
+            </Typography>
+         </Box>
+      </Modal>
       <Modal
          aria-describedby={'selectImageModalDescription'}
          aria-labelledby={'selectImageModalTitle'}
@@ -481,7 +520,7 @@ export const Index = () => {
                </Column>
             </Row>
             <Row>
-               <Column>
+               <Column className={'whiteSpaceNoWrap'}>
                   <FormControl sx={{m: 1, width: 300}}>
                      <InputLabel
                         id={'block-size-label'}
@@ -507,7 +546,7 @@ export const Index = () => {
                </Column>
             </Row>
             <Row className={'marginBottom_8'}>
-               <Column>
+               <Column className={'whiteSpaceNoWrap'}>
                   <FormGroup sx={{float: 'left', marginLeft: 1}}>
                      <FormControlLabel
                         control={<Checkbox checked={indexState.matchToPalette} onChange={handleMatchToPalette}/>}
@@ -526,7 +565,7 @@ export const Index = () => {
                className={'marginBottom_8'}
                style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
-               <Column>
+               <Column className={'whiteSpaceNoWrap'}>
                   <FormControl sx={{m: 1, width: 300}}>
                      <InputLabel
                         id={'color-depth-label'}
@@ -555,7 +594,7 @@ export const Index = () => {
                className={'marginBottom_8'}
                style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
-               <Column>
+               <Column className={'whiteSpaceNoWrap'}>
                   <FormControl sx={{m: 1, width: 300}}>
                      <InputLabel
                         id={'minimum-threshold-label'}
@@ -584,7 +623,7 @@ export const Index = () => {
                className={'marginBottom_8'}
                style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
-               <Column>
+               <Column className={'whiteSpaceNoWrap'}>
                   <FormControl sx={{m: 1, width: 300}}>
                      <InputLabel
                         id={'algorithm-label'}
@@ -613,7 +652,7 @@ export const Index = () => {
                className={'marginBottom_8'}
                style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}
             >
-               <Column>
+               <Column className={'whiteSpaceNoWrap'}>
                   <FormControl sx={{m: 1, width: 300}}>
                      <InputLabel
                         id={'color/greyscale-label'}
@@ -640,7 +679,7 @@ export const Index = () => {
                </Column>
             </Row>
             <Row style={{visibility: indexState.matchToPalette ? css3.visibility.visible : css3.visibility.hidden}}>
-               <Column>
+               <Column className={'whiteSpaceNoWrap'}>
                   <FormControl sx={{m: 1, width: 300}}>
                      <InputLabel
                         id={'palettes-label'}
@@ -693,9 +732,23 @@ export const Index = () => {
          <Column>
             <div
                className={'linkHelperPrompt'}
-               style={{display: uiState.showStatsLink ? css3.dislay.inherit : css3.dislay.none}}
+               style={{display: uiState.showPostImageLinks && !hasViewedMapOrStats ? css3.dislay.inherit : css3.dislay.none}}
             >
-               You can now use the "Stats" link in the navbar above to get more info about the generated image.
+               Use the{' '}
+               <span
+                  className={'spanLink'}
+                  onClick={navigateToMap}
+               >
+                  MAP
+               </span>{` `}
+               and{` `}
+               <span
+                  className={'spanLink'}
+                  onClick={navigateToStats}
+               >
+                  STATS
+               </span>{` `}
+               links in the top nav to get more info about the generated image.
             </div>
          </Column>
       </Row>

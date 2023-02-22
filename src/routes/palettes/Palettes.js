@@ -8,6 +8,7 @@ import { rgbModel } from '../../common/objects/models/rgbModel';
 import { useImage } from '../../common/hooks/useImage';
 import { useContext, useEffect } from 'react';
 import { UIState } from '../../UI';
+import { logGooglePageHit } from '../../common/functions/logGooglePageHit';
 
 export const Palettes = () => {
    const uiState = useContext(UIState);
@@ -16,6 +17,7 @@ export const Palettes = () => {
    useEffect(() => {
       if (uiState.showCanvas)
          uiState.setShowCanvas(false);
+      logGooglePageHit('palettes');
    });
 
    const paletteNames = [

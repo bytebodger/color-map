@@ -298,7 +298,7 @@ export const useImage = () => {
          else
             indexState.setShowProcessing(false);
          uiState.setStats(stats);
-         uiState.setShowStatsLink(matchToPalette);
+         uiState.setShowPostImageLinks(matchToPalette);
       }
       return newImage;
    };

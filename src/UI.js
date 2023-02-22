@@ -24,6 +24,7 @@ import { IndexContainer } from './routes/index/components/IndexContainer';
 import { Palettes } from './routes/palettes/Palettes';
 import { css3 } from '@toolz/css3/src/css3';
 import { Stats } from './routes/stats/Stats';
+import { Map } from './routes/map/Map';
 
 const drawerWidth = 240;
 
@@ -33,7 +34,7 @@ export const UI = props => {
    const {window} = props;
    const [mobileOpen, setMobileOpen] = useState(false);
    const [showCanvas, setShowCanvas] = useState(false);
-   const [showStatsLink, setShowStatsLink] = useState(false);
+   const [showPostImageLinks, setShowPostImageLinks] = useState(false);
    const [stats, setStats] = useState({});
    const blob = useRef(null);
    const file = useRef(null);
@@ -69,8 +70,10 @@ export const UI = props => {
 
    const getRoutes = () => {
       const routes = ['Home'];
-      if (showStatsLink)
+      if (showPostImageLinks) {
+         routes.push('Map');
          routes.push('Stats');
+      }
       routes.push('Palettes');
       routes.push('About');
       return routes;
@@ -83,10 +86,10 @@ export const UI = props => {
          blob,
          file,
          setShowCanvas,
-         setShowStatsLink,
+         setShowPostImageLinks,
          setStats,
          showCanvas,
-         showStatsLink,
+         showPostImageLinks,
          stats,
       }}>
          <Box sx={{display: 'flex'}}>
@@ -173,6 +176,11 @@ export const UI = props => {
                      element={
                         <IndexContainer/>}
                      path={'*'}
+                  />
+                  <Route
+                     element={
+                        <Map/>}
+                     path={'/map'}
                   />
                   <Route
                      element={

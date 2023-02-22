@@ -5,6 +5,7 @@ import './css/about.css';
 import '../../common/css/baseProperties.css';
 import { useContext, useEffect } from 'react';
 import { UIState } from '../../UI';
+import { logGooglePageHit } from '../../common/functions/logGooglePageHit';
 
 export const About = () => {
    const uiState = useContext(UIState);
@@ -12,6 +13,7 @@ export const About = () => {
    useEffect(() => {
       if (uiState.showCanvas)
          uiState.setShowCanvas(false);
+      logGooglePageHit('about');
    });
 
    return <>

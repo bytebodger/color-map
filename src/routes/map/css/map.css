@@ -1,0 +1,9 @@
+.cell {
+    font-weight: bold;
+    height: 50px;
+    min-height: 50px;
+    min-width: 50px;
+    text-align: center;
+    vertical-align: middle;
+    width: 50px;
+}

@@ -1,3 +1,7 @@
+.borderSpacing_0 {
+    border-spacing: 0;
+}
+
 .displayNone {
     display: none;
 }
@@ -13,6 +17,10 @@
     margin-bottom: 16px;
 }
 
+.marginBottom_48 {
+    margin-bottom: 48px;
+}
+
 .marginLeft_24 {
     margin-left: 24px;
 }
@@ -21,8 +29,18 @@
     margin-top: 20px;
 }
 
+.minHeight_500 {
+    min-height: 500px;
+}
+
 .minWidth_300 {
     min-width: 300px;
+}
+
+.spanLink {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .textAlignCenter {
@@ -31,4 +49,8 @@
 
 .textAlignRight {
     text-align: right;
+}
+
+.whiteSpaceNoWrap {
+    white-space: nowrap;
 }
