@@ -477,7 +477,7 @@ export const useImage = () => {
    };
 
    const pixelate = () => {
-      const imageData = context.current.getImageData(0, 0, canvas.current.width, canvas.current.height);
+      const { height, width } = canvas.current;
       const stats = {
          colorCounts: {},
          colors: [],
@@ -489,14 +489,14 @@ export const useImage = () => {
       const matchToPalette = local.getItem('matchToPalette');
       if (matchToPalette)
          loadPalettes();
-      totalBlocks = Math.ceil(imageData.height / blockSize) * Math.ceil(imageData.width / blockSize);
+      totalBlocks = Math.ceil(height / blockSize) * Math.ceil(width / blockSize);
       blocksProcessed = 0;
       previousProgress = 0;
-      for (let y = 0; y < imageData.height; y += blockSize) {
+      for (let y = 0; y < height; y += blockSize) {
          const row = [];
-         for (let x = 0; x < imageData.width; x += blockSize) {
-            const remainingX = imageData.width - x;
-            const remainingY = imageData.height - y;
+         for (let x = 0; x < width; x += blockSize) {
+            const remainingX = width - x;
+            const remainingY = height - y;
             const blockX = remainingX > blockSize ? blockSize : remainingX;
             const blockY = remainingY > blockSize ? blockSize : remainingY;
             const averageColor = calculateAverageColor(context.current.getImageData(x, y, blockX, blockY));
