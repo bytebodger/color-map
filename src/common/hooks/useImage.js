@@ -247,28 +247,18 @@ export const useImage = () => {
 
    const convertRgbToXyz = (rgbColor = rgbModel) => {
       allow.anInstanceOf(rgbColor, rgbModel);
+
+      const convert = color => {
+         color = color / 255;
+         color = color > 0.04045 ? Math.pow(((color + 0.055) / 1.055), 2.4) : color / 12.92;
+         color = color * 100;
+         return color;
+      }
+
       let {red, green, blue} = rgbColor;
-      red = red / 255;
-      green = green / 255;
-      blue = blue / 255;
-      // step 1
-      if (red > 0.04045)
-         red = Math.pow(((red + 0.055) / 1.055), 2.4);
-      else
-         red = red / 12.92;
-      if (green > 0.04045)
-         green = Math.pow(((green + 0.055) / 1.055), 2.4);
-      else
-         green = green / 12.92;
-      if (blue > 0.04045)
-         blue = Math.pow(((blue + 0.055) / 1.055), 2.4);
-      else
-         blue = blue / 12.92;
-      // step 2
-      red = red * 100;
-      green = green * 100;
-      blue = blue * 100;
-      // step 3
+      red = convert(red);
+      green = convert(green);
+      blue = convert(blue);
       const x = (red * 0.4124564) + (green * 0.3575761) + (blue * 0.1804375);
       const y = (red * 0.2126729) + (green * 0.7151522) + (blue * 0.0721750);
       const z = (red * 0.0193339) + (green * 0.1191920) + (blue * 0.9503041);
