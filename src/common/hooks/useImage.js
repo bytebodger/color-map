@@ -200,6 +200,45 @@ export const useImage = () => {
       };
    };
 
+   const convertRgbToHsl = (rgbcolor = rgbModel) => {
+      allow.anInstanceOf(rgbcolor, rgbModel);
+      let { red, green, blue } = rgbcolor;
+      red = red / 255;
+      green = green / 255;
+      blue = blue / 255;
+      const maximum = Math.max(red, green, blue);
+      const minimum = Math.min(red, green, blue);
+      const basis = (maximum + minimum) / 2;
+      let hue;
+      let saturation;
+      let lightness = basis;
+      if (maximum === minimum) {
+         hue = 0;
+         saturation = 0;
+      } else {
+         const difference = maximum - minimum;
+         saturation = lightness > 0.5 ? difference / (2 - maximum - minimum) : difference / (maximum + minimum);
+         switch (maximum) {
+            case red:
+               hue = (green - blue) / difference + (green < blue ? 6 : 0);
+               break;
+            case green:
+               hue = (blue - red) / difference + 2;
+               break;
+            case blue:
+            default:
+               hue = (red - green) / difference + 4;
+               break;
+         }
+         hue = hue / 6;
+      }
+      return {
+         hue,
+         saturation,
+         lightness,
+      };
+   }
+
    const convertRgbToLab = (rgbColor = rgbModel) => {
       allow.anInstanceOf(rgbColor, rgbModel);
       const xyzColor = convertRgbToXyz(rgbColor);
@@ -335,17 +374,30 @@ export const useImage = () => {
             case algorithms.XYZ:
                const {x: paletteX, y: paletteY, z: paletteZ} = convertRgbToXyz(paletteColor);
                const {x: referenceX, y: referenceY, z: referenceZ} = convertRgbToXyz(referenceColor);
-               distance = Math.abs(referenceX - paletteX)
-                  + Math.abs(referenceY - paletteY)
-                  + Math.abs(referenceZ - paletteZ);
+               distance = Math.sqrt(
+                  Math.pow(referenceX - paletteX, 2)
+                  + Math.pow(referenceY - paletteY, 2)
+                  + Math.pow(referenceZ - paletteZ, 2)
+               );
                break;
             case algorithms.CMYK:
                const {cyan: paletteCyan, magenta: paletteMagenta, yellow: paletteYellow, key: paletteKey} = convertRgbToCmyk(paletteColor);
                const {cyan: referenceCyan, magenta: referenceMagenta, yellow: referenceYellow, key: referenceKey} = convertRgbToCmyk(referenceColor);
-               distance = Math.abs(referenceCyan - paletteCyan)
-                  + Math.abs(referenceMagenta - paletteMagenta)
-                  + Math.abs(referenceYellow - paletteYellow)
-                  + Math.abs(referenceKey - paletteKey);
+               distance = Math.sqrt(
+                  Math.pow(referenceCyan - paletteCyan, 2)
+                  + Math.pow(referenceMagenta - paletteMagenta, 2)
+                  + Math.pow(referenceYellow - paletteYellow, 2)
+                  + Math.pow(referenceKey - paletteKey, 2)
+               );
+               break;
+            case algorithms.HSL:
+               const {hue: paletteHue, saturation: paletteSaturation, lightness: paletteLightness} = convertRgbToHsl(paletteColor);
+               const {hue: referenceHue, saturation: referenceSaturation, lightness: referenceLightness} = convertRgbToHsl(referenceColor);
+               distance = Math.sqrt(
+                  Math.pow(referenceHue - paletteHue, 2)
+                  + Math.pow(referenceSaturation - paletteSaturation, 2)
+                  + Math.pow(referenceLightness - paletteLightness, 2)
+               );
                break;
             case algorithms.DELTA_E:
                const paletteLabColor = convertRgbToLab(paletteColor);
@@ -354,9 +406,11 @@ export const useImage = () => {
                break;
             case algorithms.RGB:
             default:
-               distance = Math.abs(paletteColor.red - referenceColor.red)
-                  + Math.abs(paletteColor.green - referenceColor.green)
-                  + Math.abs(paletteColor.blue - referenceColor.blue);
+               distance = Math.sqrt(
+                  Math.pow(paletteColor.red - referenceColor.red, 2)
+                  + Math.pow(paletteColor.green - referenceColor.green, 2)
+                  + Math.pow(paletteColor.blue - referenceColor.blue, 2)
+               );
                break;
          }
          if (distance < shortestDistance) {
