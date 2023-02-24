@@ -47,5 +47,33 @@ export const About = () => {
             </Typography>
          </Column>
       </Row>
+      <Row>
+         <Column>
+            <h4 className={'marginBottom_8'}>How does the logic for this application <i>work</i>?</h4>
+            <Typography style={{fontSize: '0.9em'}}>
+               Please check out the following articles:
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/converting-real-world-colors-to-a-digital-format-433c'}>
+                  Converting Real-World Colors to a Digital Format
+               </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/loading-images-with-reactjavascript-3996'}>
+                  Loading Images With React/JavaScript
+               </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/pixelating-images-in-reactjavascript-2ac7'}>
+                  Pixelating Images With React/JavaScript
+               </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/determining-the-rgb-distance-between-two-colors-4n91'}>
+                  Determining the RGB "Distance" Between Two Colors
+               </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/using-different-color-spaces-to-compare-colors-5agg'}>
+                  Using Different Color Spaces to Compare Colors
+               </a>
+            </Typography>
+         </Column>
+      </Row>
    </>
 }
