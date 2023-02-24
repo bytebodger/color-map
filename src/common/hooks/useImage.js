@@ -248,18 +248,6 @@ export const useImage = () => {
    const convertRgbToXyz = (rgbColor = rgbModel) => {
       allow.anInstanceOf(rgbColor, rgbModel);
       let {red, green, blue} = rgbColor;
-      if (red > 255)
-         red = 255;
-      else if (red < 0)
-         red = 0;
-      if (green > 255)
-         green = 255;
-      else if (green < 0)
-         green = 0;
-      if (blue > 255)
-         blue = 255;
-      else if (blue < 0)
-         blue = 0;
       red = red / 255;
       green = green / 255;
       blue = blue / 255;
