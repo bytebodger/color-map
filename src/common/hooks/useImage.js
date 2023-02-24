@@ -242,7 +242,7 @@ export const useImage = () => {
    const convertRgbToLab = (rgbColor = rgbModel) => {
       allow.anInstanceOf(rgbColor, rgbModel);
       const xyzColor = convertRgbToXyz(rgbColor);
-      return convertXyzTolab(xyzColor);
+      return convertXyzToLab(xyzColor);
    };
 
    const convertRgbToXyz = (rgbColor = rgbModel) => {
@@ -291,7 +291,7 @@ export const useImage = () => {
       };
    };
 
-   const convertXyzTolab = (xyzColor = xyzModel) => {
+   const convertXyzToLab = (xyzColor = xyzModel) => {
       allow.anInstanceOf(xyzColor, xyzModel);
 
       const adjust = value => value > 0.008856 ? Math.pow(value, (1 / 3)) : (7.787 * value) + (16 / 116);
