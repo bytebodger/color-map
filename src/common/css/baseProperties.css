@@ -13,12 +13,17 @@
 .marginBottom_8 {
     margin-bottom: 8px;
 }
+
 .marginBottom_16 {
     margin-bottom: 16px;
 }
 
 .marginBottom_48 {
     margin-bottom: 48px;
+}
+
+.marginTop_0 {
+    margin-top: 0;
 }
 
 .marginLeft_24 {
@@ -53,4 +58,8 @@
 
 .whiteSpaceNoWrap {
     white-space: nowrap;
+}
+
+.width_350 {
+    width: 350px;
 }

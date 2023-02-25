@@ -1,0 +1,28 @@
+.paintCard {
+    float: left;
+    margin-bottom: 32px;
+    margin-right: 16px;
+    width: 350px;
+}
+
+.paintCardColorSwatch {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 120px;
+}
+
+.paintCardDescription {
+    font-size: 0.9em;
+    margin-bottom: 24px;
+    margin-top: 24px;
+    text-align: center;
+}
+
+.paintOptionSwatch {
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    float: left;
+    height: 20px;
+    margin-right: 20px;
+    width: 20px;
+}

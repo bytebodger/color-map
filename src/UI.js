@@ -25,6 +25,7 @@ import { Palettes } from './routes/palettes/Palettes';
 import { css3 } from '@toolz/css3/src/css3';
 import { Stats } from './routes/stats/Stats';
 import { Map } from './routes/map/Map';
+import { Mix } from './routes/mix/Mix';
 
 const drawerWidth = 240;
 
@@ -75,6 +76,7 @@ export const UI = props => {
          routes.push('Stats');
       }
       routes.push('Palettes');
+      routes.push('Mix');
       routes.push('About');
       return routes;
    }
@@ -181,6 +183,11 @@ export const UI = props => {
                      element={
                         <Map/>}
                      path={'/map'}
+                  />
+                  <Route
+                     element={
+                        <Mix/>}
+                     path={'/mix'}
                   />
                   <Route
                      element={
