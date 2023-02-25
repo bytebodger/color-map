@@ -2,7 +2,7 @@ import { Index } from '../Index';
 import { createContext, useState } from 'react';
 import { local } from '@toolz/local-storage';
 import { algorithm as algorithms } from '../../../common/objects/algorithm';
-import { useStateWithCallback } from '../../../common/hooks/useStateWithCallback';
+import { useSynchronousState } from '../../../common/hooks/useSynchronousState';
 
 export const IndexState = createContext({});
 
@@ -39,15 +39,15 @@ export const getPaletteList = () => {
 }
 
 export const IndexContainer = () => {
-   const [algorithm, setAlgorithm] = useStateWithCallback(local.getItem('algorithm', algorithms.RGB));
-   const [blockSize, setBlockSize] = useStateWithCallback(local.getItem('blockSize', 10));
-   const [colorOrGreyscale, setColorOrGreyscale] = useStateWithCallback(local.getItem('colorOrGreyscale', 'color'));
-   const [matchToPalette, setMatchToPalette] = useStateWithCallback(local.getItem('matchToPalette', false));
-   const [maximumColors, setMaximumColors] = useStateWithCallback(local.getItem('maximumColors', 0));
-   const [minimumThreshold, setMinimumThreshold] = useStateWithCallback(local.getItem('minimumThreshold', 5));
+   const [algorithm, setAlgorithm] = useSynchronousState(local.getItem('algorithm', algorithms.RGB));
+   const [blockSize, setBlockSize] = useSynchronousState(local.getItem('blockSize', 10));
+   const [colorOrGreyscale, setColorOrGreyscale] = useSynchronousState(local.getItem('colorOrGreyscale', 'color'));
+   const [matchToPalette, setMatchToPalette] = useSynchronousState(local.getItem('matchToPalette', false));
+   const [maximumColors, setMaximumColors] = useSynchronousState(local.getItem('maximumColors', 0));
+   const [minimumThreshold, setMinimumThreshold] = useSynchronousState(local.getItem('minimumThreshold', 5));
    const [paletteList, setPaletteList] = useState(getPaletteList());
    const [paletteArray, setPaletteArray] = useState(getPaletteArray());
-   const [palettes, setPalettes] = useStateWithCallback(local.getItem('palettes') || {});
+   const [palettes, setPalettes] = useSynchronousState(local.getItem('palettes') || {});
    const [progress, setProgress] = useState([0]);
    const [showProcessing, setShowProcessing] = useState(false);
 

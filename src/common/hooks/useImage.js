@@ -9,7 +9,6 @@ import { labModel } from '../objects/models/labModel';
 import { cmykModel } from '../objects/models/cmykModel';
 import { IndexState } from '../../routes/index/components/IndexContainer';
 import { UIState } from '../../UI';
-import { local } from '@toolz/local-storage';
 
 export const useImage = () => {
    const canvas = useRef(null);
@@ -36,16 +35,15 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
-      const algorithm = local.getItem('algorithm');
-      const blockSize = local.getItem('blockSize');
+      const { algorithm, blockSize } = indexState;
       palette = filterPalette(stats);
-      for (let y = 0; y < imageData.height; y += blockSize) {
+      for (let y = 0; y < imageData.height; y += blockSize()) {
          const row = [];
-         for (let x = 0; x < imageData.width; x += blockSize) {
+         for (let x = 0; x < imageData.width; x += blockSize()) {
             const remainingX = imageData.width - x;
             const remainingY = imageData.height - y;
-            const blockX = remainingX > blockSize ? blockSize : remainingX;
-            const blockY = remainingY > blockSize ? blockSize : remainingY;
+            const blockX = remainingX > blockSize() ? blockSize() : remainingX;
+            const blockY = remainingY > blockSize() ? blockSize() : remainingY;
             const {red, green, blue} = getRgbFromImageData(imageData, x, y);
             const referenceColor = {
                blue,
@@ -67,7 +65,7 @@ export const useImage = () => {
          adjustedStats.map.push(row);
       }
       indexState.setShowProcessing(false);
-      console.log(`${algorithm} color depth adjustment finished at ${window.performance.now()}`);
+      console.log(`${algorithm()} color depth adjustment finished at ${window.performance.now()}`);
       return adjustedStats;
    };
 
@@ -308,14 +306,13 @@ export const useImage = () => {
          context.current = canvas.current.getContext('2d', {alpha: false, willReadFrequently: true});
          context.current.drawImage(newImage, 0, 0);
          let stats = pixelate();
-         const matchToPalette = local.getItem('matchToPalette');
-         const maximumColors = local.getItem('maximumColors');
-         if (matchToPalette && maximumColors !== 0)
+         const { matchToPalette, maximumColors } = indexState;
+         if (matchToPalette() && maximumColors() !== 0)
             stats = adjustColorDepth(stats);
          else
             indexState.setShowProcessing(false);
          uiState.setStats(stats);
-         uiState.setShowPostImageLinks(matchToPalette);
+         uiState.setShowPostImageLinks(matchToPalette());
       }
    };
 
@@ -343,12 +340,12 @@ export const useImage = () => {
          red: -1,
       };
       let shortestDistance = Number.MAX_SAFE_INTEGER;
-      const algorithm = local.getItem('algorithm');
+      const { algorithm } = indexState;
       palette.forEach(paletteColor => {
          if (shortestDistance === 0)
             return;
          let distance;
-         switch (algorithm) {
+         switch (algorithm()) {
             case algorithms.XYZ:
                const {x: paletteX, y: paletteY, z: paletteZ} = convertRgbToXyz(paletteColor);
                const {x: referenceX, y: referenceY, z: referenceZ} = convertRgbToXyz(referenceColor);
@@ -432,14 +429,14 @@ export const useImage = () => {
    }
 
    const loadPalettes = () => {
-      const chosenPalettes = local.getItem('palettes');
+      const { palettes: chosenPalettes } = indexState;
       const white = {
          red: 255,
          green: 255,
          blue: 255,
          name: 'generic white',
       };
-      Object.entries(chosenPalettes).forEach(entry => {
+      Object.entries(chosenPalettes()).forEach(entry => {
          const [name, shouldLoad] = entry;
          if (!shouldLoad)
             return;
@@ -515,22 +512,19 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
-      const algorithm = local.getItem('algorithm');
-      const blockSize = local.getItem('blockSize');
-      const colorOrGreyscale = local.getItem('colorOrGreyscale');
-      const matchToPalette = local.getItem('matchToPalette');
-      if (matchToPalette)
+      const { algorithm, blockSize, colorOrGreyscale, matchToPalette } = indexState;
+      if (matchToPalette())
          loadPalettes();
-      totalBlocks = Math.ceil(height / blockSize) * Math.ceil(width / blockSize);
+      totalBlocks = Math.ceil(height / blockSize()) * Math.ceil(width / blockSize());
       blocksProcessed = 0;
       previousProgress = 0;
-      for (let y = 0; y < height; y += blockSize) {
+      for (let y = 0; y < height; y += blockSize()) {
          const row = [];
-         for (let x = 0; x < width; x += blockSize) {
+         for (let x = 0; x < width; x += blockSize()) {
             const remainingX = width - x;
             const remainingY = height - y;
-            const blockX = remainingX > blockSize ? blockSize : remainingX;
-            const blockY = remainingY > blockSize ? blockSize : remainingY;
+            const blockX = remainingX > blockSize() ? blockSize() : remainingX;
+            const blockY = remainingY > blockSize() ? blockSize() : remainingY;
             const averageColor = calculateAverageColor(context.current.getImageData(x, y, blockX, blockY));
             let referenceColor = {
                blue: averageColor.blue,
@@ -538,13 +532,13 @@ export const useImage = () => {
                red: averageColor.red,
                name: '',
             };
-            if (colorOrGreyscale === 'greyscale') {
+            if (colorOrGreyscale() === 'greyscale') {
                const darkness = Math.round((averageColor.red + averageColor.green + averageColor.blue) / 3);
                referenceColor.red = darkness;
                referenceColor.green = darkness;
                referenceColor.blue = darkness;
             }
-            const closestColor = matchToPalette ? getClosestColorInThePalette(referenceColor) : averageColor;
+            const closestColor = matchToPalette() ? getClosestColorInThePalette(referenceColor) : averageColor;
             if (!closestColor.name)
                closestColor.name = `${closestColor.red}_${closestColor.green}_${closestColor.blue}`;
             row.push(closestColor);
@@ -565,8 +559,8 @@ export const useImage = () => {
          previousProgress = currentProgress;
          stats.map.push(row);
       }
-      if (matchToPalette)
-         console.log(`${algorithm} calculation finished at ${window.performance.now()}`);
+      if (matchToPalette())
+         console.log(`${algorithm()} calculation finished at ${window.performance.now()}`);
       else
          console.log(`raw calculation finished at ${window.performance.now()}`);
       return stats;
@@ -589,11 +583,10 @@ export const useImage = () => {
       const colorCounts = [];
       Object.entries(stats.colorCounts).forEach(colorCount => colorCounts.push(colorCount));
       colorCounts.sort(sort);
-      const maximumColors = local.getItem('maximumColors');
-      const minimumThreshold = local.getItem('minimumThreshold');
+      const { maximumColors, minimumThreshold } = indexState;
       return colorCounts.filter((colorCount, index) => {
          const [, count] = colorCount;
-         return index < maximumColors && count >= minimumThreshold;
+         return index < maximumColors() && count >= minimumThreshold();
       });
    };
 
