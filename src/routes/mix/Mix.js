@@ -9,7 +9,6 @@ import { allow } from '@toolz/allow-react';
 import { is } from '../../common/objects/is';
 import { css3 } from '@toolz/css3/src/css3';
 import { useImage } from '../../common/hooks/useImage';
-import Typography from '@mui/material/Typography';
 
 export const Mix = () => {
    const [paints, setPaints] = useState([]);
