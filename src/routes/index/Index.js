@@ -425,13 +425,13 @@ export const Index = () => {
                <b>RGB:</b> Calculates the Root-Mean-Square (RMS) between the {`{`}red, green, blue{`}`} values of the source color versus each color
                in the chosen palettes.
                <br/><br/>
-               <b>HSL:</b> Calculates the (RMS) between the {`{`}hue, saturation, lightness{`}`} values of the source color versus each color
+               <b>HSL:</b> Calculates the RMS between the {`{`}hue, saturation, lightness{`}`} values of the source color versus each color
                in the chosen palettes.
                <br/><br/>
-               <b>CMYK:</b> Calculates the (RMS) between the {`{`}cyan, magenta, yellow, key{`}`} values of the source color versus each color
+               <b>CMYK:</b> Calculates the RMS between the {`{`}cyan, magenta, yellow, key{`}`} values of the source color versus each color
                in the chosen palettes.
                <br/><br/>
-               <b>XYZ:</b> Calculates the (RMS) between the {`{`}x, y, z{`}`} values of the source color versus each color
+               <b>XYZ:</b> Calculates the RMS between the {`{`}x, y, z{`}`} values of the source color versus each color
                in the chosen palettes (based on the CIE 1931 color space).
                <br/><br/>
                <b>Delta-E 2000:</b> This is a formula, first developed in the 1970s, based on the L*a*b* colorspace.  Like the approaches detailed
