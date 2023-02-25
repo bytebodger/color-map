@@ -155,7 +155,7 @@ export const Mix = () => {
          <Typography>
             This shows you the colors that will result when you mix paints.  This does <i>not</i> calculate the result of mixing RGB colors in
             an <i>additive</i> fashion.  It shows you what will result when you mix real-world colors (e.g., <i>paints</i>), which is calculated
-            in a <i>substractive</i> fashion.
+            in a <i>subtractive</i> fashion.
          </Typography>
       </div>
       <Row
