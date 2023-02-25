@@ -422,15 +422,17 @@ export const Index = () => {
             >
                There are numerous ways to try to measure how close two different colors are to each other.  The options given here are as follows:
                <br/><br/>
-               <b>RGB:</b> For any two colors, the difference between Red 1 and Red 2 is added to the difference between Green 1 and Green 2, which is
-               then added to the difference between Blue 1 and Blue 2.
+               <b>RGB:</b> Calculates the Root-Mean-Square (RMS) between the {`{`}red, green, blue{`}`} values of the source color versus each color
+               in the chosen palettes.
                <br/><br/>
-               <b>XYZ:</b> For any two colors, they are plotted on a three-dimensional color matrix.  Then the difference between X 1 and X 2 is
-               added to the difference between Y 1 and Y 2, which is then added to the difference between Z 1 and Z 2.
+               <b>HSL:</b> Calculates the (RMS) between the {`{`}hue, saturation, lightness{`}`} values of the source color versus each color
+               in the chosen palettes.
                <br/><br/>
-               <b>CMYK:</b> For any two colors, they are converted to CMYK values.  (CMYK is the color coding scheme used in printed media.)  Then
-               the difference between Cyan 1 and Cyan 2 is added to the difference between Magenta 1 and Magenta 2, which is then added to the
-               difference between Yellow 1 and Yellow 2, which is then added to the difference between Key 1 and Key 2.
+               <b>CMYK:</b> Calculates the (RMS) between the {`{`}cyan, magenta, yellow, key{`}`} values of the source color versus each color
+               in the chosen palettes.
+               <br/><br/>
+               <b>XYZ:</b> Calculates the (RMS) between the {`{`}x, y, z{`}`} values of the source color versus each color
+               in the chosen palettes (based on the CIE 1931 color space).
                <br/><br/>
                <b>Delta-E 2000:</b> This is a formula, first developed in the 1970s, based on the L*a*b* colorspace.  Like the approaches detailed
                above, it's designed to represent the "difference" between two colors with a single numeric value.  However, this formula is
