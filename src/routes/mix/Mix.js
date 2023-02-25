@@ -150,14 +150,7 @@ export const Mix = () => {
    loadMixedColor();
 
    return <>
-      <h4 className={'marginBottom_8'}>Paint Mixing</h4>
-      <div className={'marginBottom_48'}>
-         <Typography>
-            This shows you the colors that will result when you mix paints.  This does <i>not</i> calculate the result of mixing RGB colors in
-            an <i>additive</i> fashion.  It shows you what will result when you mix real-world colors (e.g., <i>paints</i>), which is calculated
-            in a <i>subtractive</i> fashion.
-         </Typography>
-      </div>
+      <h4 className={'marginBottom_48'}>Paint Mixing</h4>
       <Row
          className={'marginBottom_48'}
          style={{visibility: paints.length ? css3.visibility.visible : css3.visibility.hidden}}
