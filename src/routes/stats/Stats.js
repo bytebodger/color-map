@@ -47,6 +47,7 @@ export const Stats = () => {
                key={paintName}
                sx={{'&:last-child td, &:last-child th': {border: 0}}}
             >
+               <TableCell style={{textAlign: css3.textAlign.center}}><b>{index + 1}.</b></TableCell>
                <TableCell style={{textAlign: css3.textAlign.center}}>{paintIndex}</TableCell>
                <TableCell style={{textAlign: css3.textAlign.center}}>{count}</TableCell>
                {getColorCell(paintName)}
@@ -103,11 +104,12 @@ export const Stats = () => {
          >
             <TableHead>
                <TableRow>
+                  <TableCell style={{width: 75}}/>
                   <TableCell style={{
                      textAlign: css3.textAlign.center,
                      width: 75,
                   }}>
-                     <b>Index</b>
+                     <b>Ref</b>
                   </TableCell>
                   <TableCell style={{
                      textAlign: css3.textAlign.center,
