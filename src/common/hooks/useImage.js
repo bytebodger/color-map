@@ -37,6 +37,7 @@ export const useImage = () => {
       };
       const { algorithm, blockSize } = indexState;
       palette = filterPalette(stats);
+      let noise = {};
       for (let y = 0; y < imageData.height; y += blockSize()) {
          const row = [];
          for (let x = 0; x < imageData.width; x += blockSize()) {
@@ -44,7 +45,9 @@ export const useImage = () => {
             const remainingY = imageData.height - y;
             const blockX = remainingX > blockSize() ? blockSize() : remainingX;
             const blockY = remainingY > blockSize() ? blockSize() : remainingY;
-            const {red, green, blue} = getRgbFromImageData(imageData, x, y);
+            let originalColor = getRgbFromImageData(imageData, x, y);
+            originalColor = applyDithering(noise, originalColor, x, y);
+            const {red, green, blue} = originalColor;
             const referenceColor = {
                blue,
                green,
@@ -53,6 +56,7 @@ export const useImage = () => {
             };
             const color = getClosestColorInThePalette(referenceColor);
             row.push(color);
+            noise = recordNoise(noise, originalColor, color, x, y);
             if (Object.hasOwn(adjustedStats.colorCounts, color.name))
                adjustedStats.colorCounts[color.name]++;
             else {
