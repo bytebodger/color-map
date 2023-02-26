@@ -83,6 +83,18 @@ export const useImage = () => {
          ditheredColor.red += noise[y][x].red;
          ditheredColor.green += noise[y][x].green;
          ditheredColor.blue += noise[y][x].blue;
+         if (ditheredColor.red > 255)
+            ditheredColor.red = 255;
+         if (ditheredColor.red < 0)
+            ditheredColor.red = 0;
+         if (ditheredColor.green > 255)
+            ditheredColor.green = 255;
+         if (ditheredColor.green < 0)
+            ditheredColor.green = 0;
+         if (ditheredColor.blue > 255)
+            ditheredColor.blue = 255;
+         if (ditheredColor.blue < 0)
+            ditheredColor.blue = 0;
       }
       return ditheredColor;
    }
