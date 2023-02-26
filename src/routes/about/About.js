@@ -72,6 +72,10 @@ export const About = () => {
                <a href={'https://dev.to/bytebodger/using-different-color-spaces-to-compare-colors-5agg'}>
                   Using Different Color Spaces to Compare Colors
                </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/dithering-images-with-reactjavascript-och'}>
+                  Dithering Images with React/JavaScript
+               </a>
             </Typography>
          </Column>
       </Row>
