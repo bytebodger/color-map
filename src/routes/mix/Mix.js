@@ -1,6 +1,6 @@
 import { Row } from '@toolz/material-ui/dist/components/Row';
 import { Column } from '@toolz/material-ui/dist/components/Column';
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect, useContext } from 'react';
 import '../../common/css/baseProperties.css';
 import { FormControl, InputLabel, Select, OutlinedInput, MenuItem, Card, CardContent, Button } from '@mui/material';
 import { palettes } from '../../common/arrays/palettes';
@@ -9,12 +9,19 @@ import { allow } from '@toolz/allow-react';
 import { is } from '../../common/objects/is';
 import { css3 } from '@toolz/css3/src/css3';
 import { useImage } from '../../common/hooks/useImage';
+import { UIState } from '../../UI';
 
 export const Mix = () => {
    const [paints, setPaints] = useState([]);
    const palette = useRef(palettes.basePaints);
+   const uiState = useContext(UIState);
    const image = useImage();
    let mixed;
+
+   useEffect(() => {
+      if (uiState.showCanvas)
+         uiState.setShowCanvas(false);
+   });
 
    useMemo(() => {
       const compare = (a, b) => {
