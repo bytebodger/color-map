@@ -324,8 +324,8 @@ export const useImage = () => {
          context.current = canvas.current.getContext('2d', {alpha: false, willReadFrequently: true});
          context.current.drawImage(newImage, 0, 0);
          let stats = pixelate();
-         const { matchToPalette, maximumColors } = indexState;
-         if (matchToPalette() && maximumColors() !== 0)
+         const { matchToPalette, maximumColors, minimumThreshold } = indexState;
+         if (matchToPalette() && (maximumColors() !== 0 || minimumThreshold() > 1))
             stats = adjustColorDepth(stats);
          else
             indexState.setShowProcessing(false);
@@ -642,14 +642,13 @@ export const useImage = () => {
             return 0;
       };
 
-      const colorCounts = [];
-      Object.entries(stats.colorCounts).forEach(colorCount => colorCounts.push(colorCount));
-      colorCounts.sort(sort);
       const { maximumColors, minimumThreshold } = indexState;
-      return colorCounts.filter((colorCount, index) => {
+      const colorCounts = Object.entries(stats.colorCounts).filter(colorCount => {
          const [, count] = colorCount;
-         return index < maximumColors() && count >= minimumThreshold();
-      });
+         return count >= minimumThreshold();
+      })
+      colorCounts.sort(sort);
+      return colorCounts.slice(0, maximumColors());
    };
 
    return {
