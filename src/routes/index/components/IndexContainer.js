@@ -42,6 +42,7 @@ export const IndexContainer = () => {
    const [algorithm, setAlgorithm] = useSynchronousState(local.getItem('algorithm', algorithms.RGB));
    const [blockSize, setBlockSize] = useSynchronousState(local.getItem('blockSize', 10));
    const [colorOrGreyscale, setColorOrGreyscale] = useSynchronousState(local.getItem('colorOrGreyscale', 'color'));
+   const [dither, setDither] = useSynchronousState(local.getItem('dither', false));
    const [matchToPalette, setMatchToPalette] = useSynchronousState(local.getItem('matchToPalette', false));
    const [maximumColors, setMaximumColors] = useSynchronousState(local.getItem('maximumColors', 0));
    const [minimumThreshold, setMinimumThreshold] = useSynchronousState(local.getItem('minimumThreshold', 5));
@@ -55,6 +56,7 @@ export const IndexContainer = () => {
          algorithm,
          blockSize,
          colorOrGreyscale,
+         dither,
          matchToPalette,
          maximumColors,
          minimumThreshold,
@@ -64,6 +66,7 @@ export const IndexContainer = () => {
          setAlgorithm,
          setBlockSize,
          setColorOrGreyscale,
+         setDither,
          setMatchToPalette,
          setMaximumColors,
          setMinimumThreshold,

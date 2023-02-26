@@ -37,6 +37,7 @@ export const Index = () => {
    const [blockSizeModalOpen, setBlockSizeModalOpen] = useState(false);
    const [colorDepthModalOpen, setColorDepthModalOpen] = useState(false);
    const [colorOrGreyscaleModalOpen, setColorOrGreyscaleModalOpen] = useState(false);
+   const [ditherModalOpen, setDitherModalOpen] = useState(false);
    const [introModalOpen, setIntroModalOpen] = useState(!local.getItem('hasSeenIntroModal', false));
    const [matchToPaletteModalOpen, setMatchToPaletteModalOpen] = useState(false);
    const [minimumTresholdModalOpen, setMinimumThresholdModalOpen] = useState(false);
@@ -47,7 +48,7 @@ export const Index = () => {
    const file = useFile();
    const navigateTo = useNavigate();
    const hasViewedMapOrStats = local.getItem('hasViewedMapOrStats', false);
-   const { algorithm, blockSize, colorOrGreyscale, matchToPalette, maximumColors, minimumThreshold, palettes } = indexState;
+   const { algorithm, blockSize, colorOrGreyscale, dither,matchToPalette, maximumColors, minimumThreshold, palettes } = indexState;
 
    useEffect(() => {
       if (!uiState.showCanvas)
@@ -167,6 +168,18 @@ export const Index = () => {
 
    const handleColorOrGreyscaleModalOpen = () => setColorOrGreyscaleModalOpen(true);
 
+   const handleDither = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      const {checked} = event.target;
+      local.setItem('dither', checked);
+      indexState.setDither(checked);
+      file.reload();
+   };
+
+   const handleDitherModalClosed = () => setDitherModalOpen(false);
+
+   const handleDitherModalOpen = () => setDitherModalOpen(true);
+
    const handleFile = (event = {}) => {
       allow.anObject(event, is.not.empty);
       const [source] = event.target.files;
@@ -276,7 +289,7 @@ export const Index = () => {
                id={'introModalDescription'}
                sx={{ mt: 2, textAlign: 'justify' }}
             >
-               This is a tool for translating colors from digital images into paint colors.  You can click around on the links in the
+               This is a tool for translating colors from digital images into paints.  You can click around on the links in the
                nav bar, or update the values in the form, but you won't see anything updating onscreen until you select a valid
                image file from your system with the SELECT IMAGE button.
             </Typography>
@@ -503,6 +516,30 @@ export const Index = () => {
                Expanding the number of available palettes will make the resulting image more closely resemble the source file - but it will
                also mean that you need to mix more paints to bring that image to a canvas.  However, this problem can me mitigated by using the
                Color Depth and Minimum Threshold features.
+            </Typography>
+         </Box>
+      </Modal>
+      <Modal
+         aria-describedby={'ditherModalDescription'}
+         aria-labelledby={'ditherModalTitle'}
+         onClose={handleDitherModalClosed}
+         open={ditherModalOpen}
+      >
+         <Box sx={style}>
+            <Typography
+               component={'h2'}
+               id={'ditherModalTitle'}
+               variant={'h6'}
+            >
+               Dither
+            </Typography>
+            <Typography
+               id={'ditherModalDescription'}
+               sx={{ mt: 2, textAlign: 'justify' }}
+            >
+               Dithering will be applied to the processed image when this box is checked.  Dithering is a process of uniformly distributing
+               "noise" in an image.  The purpose of this distribution is to keep blocks, or bands, of identical colors from forming.  At times,
+               it can make the image look noisy.  But it can also make the image look more uniform.
             </Typography>
          </Box>
       </Modal>
@@ -736,6 +773,20 @@ export const Index = () => {
                   <HelpTwoTone
                      className={'questionMarkIcon2'}
                      onClick={handlePalettesModalOpen}
+                  />
+               </Column>
+            </Row>
+            <Row className={'marginBottom_8'}>
+               <Column className={'whiteSpaceNoWrap'}>
+                  <FormGroup sx={{float: 'left', marginLeft: 1}}>
+                     <FormControlLabel
+                        control={<Checkbox checked={dither()} onChange={handleDither}/>}
+                        label={'Dither'}
+                     />
+                  </FormGroup>
+                  <HelpTwoTone
+                     className={'questionMarkIcon'}
+                     onClick={handleDitherModalOpen}
                   />
                </Column>
             </Row>

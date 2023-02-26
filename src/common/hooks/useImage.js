@@ -69,6 +69,20 @@ export const useImage = () => {
       return adjustedStats;
    };
 
+   const applyDithering = (noise = {}, color = {}, x = -1, y = -1) => {
+      allow.anObject(noise).anObject(color, is.not.empty).anInteger(x, is.not.negative).anInteger(y, is.not.negative);
+      const { dither, matchToPalette } = indexState;
+      if (!dither() || !matchToPalette())
+         return color;
+      const ditheredColor = {...color};
+      if (Object.hasOwn(noise, y) && Object.hasOwn(noise[y], x)) {
+         ditheredColor.red += noise[y][x].red;
+         ditheredColor.green += noise[y][x].green;
+         ditheredColor.blue += noise[y][x].blue;
+      }
+      return ditheredColor;
+   }
+
    const calculateAverageColor = (imageData = {}) => {
       allow.anObject(imageData, is.not.empty);
       let redSum = 0;
@@ -518,6 +532,7 @@ export const useImage = () => {
       totalBlocks = Math.ceil(height / blockSize()) * Math.ceil(width / blockSize());
       blocksProcessed = 0;
       previousProgress = 0;
+      let noise = {};
       for (let y = 0; y < height; y += blockSize()) {
          const row = [];
          for (let x = 0; x < width; x += blockSize()) {
@@ -525,7 +540,8 @@ export const useImage = () => {
             const remainingY = height - y;
             const blockX = remainingX > blockSize() ? blockSize() : remainingX;
             const blockY = remainingY > blockSize() ? blockSize() : remainingY;
-            const averageColor = calculateAverageColor(context.current.getImageData(x, y, blockX, blockY));
+            let averageColor = calculateAverageColor(context.current.getImageData(x, y, blockX, blockY));
+            averageColor = applyDithering(noise, averageColor, x, y);
             let referenceColor = {
                blue: averageColor.blue,
                green: averageColor.green,
@@ -542,6 +558,7 @@ export const useImage = () => {
             if (!closestColor.name)
                closestColor.name = `${closestColor.red}_${closestColor.green}_${closestColor.blue}`;
             row.push(closestColor);
+            noise = recordNoise(noise, averageColor, closestColor, x, y);
             if (Object.hasOwn(stats.colorCounts, closestColor.name))
                stats.colorCounts[closestColor.name]++;
             else {
@@ -565,6 +582,47 @@ export const useImage = () => {
          console.log(`raw calculation finished at ${window.performance.now()}`);
       return stats;
    };
+
+   const recordNoise = (noise = {}, color1 = {}, color2 = {}, x = -1, y = -1) => {
+      allow.anObject(noise).anObject(color1, is.not.empty).anObject(color2, is.not.empty).anInteger(x, is.not.negative).anInteger(y, is.not.negative);
+      const { blockSize, dither, matchToPalette } = indexState;
+      const block = blockSize();
+      if (!dither() || !matchToPalette())
+         return noise;
+      const redError = color1.red - color2.red;
+      const greenError = color1.green - color2.green;
+      const blueError = color1.blue - color2.blue;
+      const noiseObject = {
+         red: 0,
+         green: 0,
+         blue: 0,
+      }
+      if (!Object.hasOwn(noise, y))
+         noise[y] = {};
+      if (!Object.hasOwn(noise, y + block))
+         noise[y + block] = {};
+      if (!Object.hasOwn(noise[y], x + block))
+         noise[y][x + block] = {...noiseObject};
+      if (!Object.hasOwn(noise[y + block], x - block))
+         noise[y + block][x - block] = {...noiseObject};
+      if (!Object.hasOwn(noise[y + block], x))
+         noise[y + block][x] = {...noiseObject};
+      if (!Object.hasOwn(noise[y + block], x + block))
+         noise[y + block][x + block] = {...noiseObject};
+      noise[y][x + block].red += redError * 7 / 16;
+      noise[y][x + block].green += greenError * 7 / 16;
+      noise[y][x + block].blue += blueError * 7 / 16;
+      noise[y + block][x - block].red += redError * 3 / 16;
+      noise[y + block][x - block].green += greenError * 3 / 16;
+      noise[y + block][x - block].blue += blueError * 3 / 16;
+      noise[y + block][x].red += redError * 5 / 16;
+      noise[y + block][x].green += greenError * 5 / 16;
+      noise[y + block][x].blue += blueError * 5 / 16;
+      noise[y + block][x + block].red += redError / 16;
+      noise[y + block][x + block].green += greenError / 16;
+      noise[y + block][x + block].blue += blueError / 16;
+      return noise;
+   }
 
    const sortPalette = (stats = {}) => {
       allow.anObject(stats, is.not.empty);
