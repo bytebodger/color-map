@@ -80,6 +80,10 @@ export const About = () => {
                <a href={'https://dev.to/bytebodger/color-mixing-with-javascript-1llh'}>
                   Color Mixing With JavaScript
                </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/using-virtual-color-mixing-to-extend-your-palette-in-reactjavascript-l41'}>
+                  Using Virtual Color Mixing to Extend Your Palette in React/JavaScript
+               </a>
             </Typography>
          </Column>
       </Row>
