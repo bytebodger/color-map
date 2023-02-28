@@ -269,6 +269,9 @@ export const Index = () => {
             <CircularProgress color={'inherit'}/>
             <br/>
             Image Processing...
+            <br/>
+            <br/>
+            (This won't time out in your browser if you open the Inspector Tools.)
          </div>
       </Backdrop>
       <Modal
@@ -776,8 +779,8 @@ export const Index = () => {
                   />
                </Column>
             </Row>
-            <Row className={'marginBottom_8'}>
-               <Column className={'whiteSpaceNoWrap'}>
+            <Row>
+               <Column className={'whiteSpaceNoWrap'} style={{visibility: matchToPalette() ? css3.visibility.visible : css3.visibility.hidden}}>
                   <FormGroup sx={{float: 'left', marginLeft: 1}}>
                      <FormControlLabel
                         control={<Checkbox checked={dither()} onChange={handleDither}/>}

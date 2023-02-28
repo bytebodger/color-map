@@ -22,6 +22,7 @@ export const useImage = () => {
    let blocksProcessed;
    let previousProgress;
    let currentProgress;
+   let outputCounter = 0;
 
    useEffect(() => {
       canvas.current = document.getElementById('canvas');
@@ -110,18 +111,12 @@ export const useImage = () => {
       for (let x = 0; x < imageData.width; x++) {
          for (let y = 0; y < imageData.height; y++) {
             const {red, green, blue} = getRgbFromImageData(imageData, x, y);
-            if (red) {
-               redSum += red;
-               redCounter++;
-            }
-            if (green) {
-               greenSum += green;
-               greenCounter++;
-            }
-            if (blue) {
-               blueSum += blue;
-               blueCounter++;
-            }
+            redSum += red;
+            redCounter++;
+            greenSum += green;
+            greenCounter++;
+            blueSum += blue;
+            blueCounter++;
          }
       }
       return {
@@ -379,6 +374,11 @@ export const useImage = () => {
             case algorithms.XYZ:
                const {x: paletteX, y: paletteY, z: paletteZ} = convertRgbToXyz(paletteColor);
                const {x: referenceX, y: referenceY, z: referenceZ} = convertRgbToXyz(referenceColor);
+               outputCounter++;
+               if (outputCounter < 10) {
+                  //console.log('palette', paletteX, paletteY, paletteZ);
+                  //console.log('reference', referenceX, referenceY, referenceZ);
+               }
                distance = Math.sqrt(
                   Math.pow(referenceX - paletteX, 2)
                   + Math.pow(referenceY - paletteY, 2)
@@ -388,6 +388,11 @@ export const useImage = () => {
             case algorithms.CMYK:
                const {cyan: paletteCyan, magenta: paletteMagenta, yellow: paletteYellow, key: paletteKey} = convertRgbToCmyk(paletteColor);
                const {cyan: referenceCyan, magenta: referenceMagenta, yellow: referenceYellow, key: referenceKey} = convertRgbToCmyk(referenceColor);
+               outputCounter++;
+               if (outputCounter < 10) {
+                  //console.log('palette', paletteCyan, paletteMagenta, paletteYellow, paletteKey);
+                  //console.log('reference', referenceCyan, referenceMagenta, referenceYellow, referenceKey);
+               }
                distance = Math.sqrt(
                   Math.pow(referenceCyan - paletteCyan, 2)
                   + Math.pow(referenceMagenta - paletteMagenta, 2)
@@ -398,6 +403,11 @@ export const useImage = () => {
             case algorithms.HSL:
                const {hue: paletteHue, saturation: paletteSaturation, lightness: paletteLightness} = convertRgbToHsl(paletteColor);
                const {hue: referenceHue, saturation: referenceSaturation, lightness: referenceLightness} = convertRgbToHsl(referenceColor);
+               outputCounter++;
+               if (outputCounter < 10) {
+                  //console.log('palette', paletteHue, paletteSaturation, paletteLightness);
+                  //console.log('reference', referenceHue, referenceSaturation, referenceLightness);
+               }
                distance = Math.sqrt(
                   Math.pow(referenceHue - paletteHue, 2)
                   + Math.pow(referenceSaturation - paletteSaturation, 2)
@@ -429,7 +439,7 @@ export const useImage = () => {
 
    const getPixelFromImageData = (imageData = {}, x = -1, y = -1) => {
       allow.anObject(imageData).anInteger(x, is.not.negative).anInteger(y, is.not.negative);
-      const index = getPixelIndex(x, y);
+      const index = getPixelIndex(imageData, x, y);
       return {
          blue: [imageData.data[index + 2], index + 2],
          green: [imageData.data[index + 1], index + 1],
@@ -439,9 +449,9 @@ export const useImage = () => {
       };
    };
 
-   const getPixelIndex = (x = -1, y = -1) => {
+   const getPixelIndex = (imageData = {}, x = -1, y = -1) => {
       allow.anInteger(x, is.not.negative).anInteger(y, is.not.negative);
-      return ((image.current.width * y) + x) * 4;
+      return ((imageData.width * y) + x) * 4;
    };
 
    const getRgbFromImageData = (imageData = {}, x = -1, y = -1) => {
