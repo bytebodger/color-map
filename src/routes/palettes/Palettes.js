@@ -198,5 +198,6 @@ export const Palettes = () => {
             </TableBody>
          </Table>
       </TableContainer>
+      <div className={'minHeight_500'}></div>
    </>
 }
