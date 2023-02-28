@@ -189,7 +189,11 @@ export const useImage = () => {
 
    const convertCmykToRgb = (cmykColor = cmykModel) => {
       allow.anInstanceOf(cmykColor, cmykModel);
-      const {cyan, magenta, yellow, key} = cmykColor;
+      let {cyan, magenta, yellow, key} = cmykColor;
+      cyan /= 100;
+      magenta /= 100;
+      yellow /= 100;
+      key /= 100;
       let red = cyan * (1.0 - key) + key;
       let green = magenta * (1.0 - key) + key;
       let blue = yellow * (1.0 - key) + key;
@@ -211,10 +215,10 @@ export const useImage = () => {
       let yellow = 255 - blue;
       let key = Math.min(cyan, magenta, yellow);
       const divider = key === 255 ? 1 : 255 - key;
-      cyan = ((cyan - key) / divider);
-      magenta = ((magenta - key) / divider);
-      yellow = ((yellow - key) / divider);
-      key = key / 255;
+      cyan = Math.round(((cyan - key) / divider) * 100);
+      magenta = Math.round(((magenta - key) / divider) * 100);
+      yellow = Math.round(((yellow - key) / divider) * 100);
+      key = Math.round((key / 255) * 100);
       return {
          cyan,
          magenta,
@@ -524,8 +528,7 @@ export const useImage = () => {
 
    const mixRgbColorsSubtractively = (rgbColors = [rgbModel]) => {
       allow.anArrayOfInstances(rgbColors, rgbModel);
-      let cmykColors = [];
-      rgbColors.forEach(rgbColor => cmykColors.push(convertRgbToCmyk(rgbColor)));
+      let cmykColors = rgbColors.map(rgbColor => convertRgbToCmyk(rgbColor));
       let cyan = 0;
       let magenta = 0;
       let yellow = 0;
@@ -537,10 +540,10 @@ export const useImage = () => {
          key += cmykColor.key;
       });
       const cmykColor = {
-         cyan: cyan / cmykColors.length,
-         magenta: magenta / cmykColors.length,
-         yellow: yellow / cmykColors.length,
-         key: key / cmykColors.length,
+         cyan: Math.round(cyan / cmykColors.length),
+         magenta: Math.round(magenta / cmykColors.length),
+         yellow: Math.round(yellow / cmykColors.length),
+         key: Math.round(key / cmykColors.length),
       };
       return convertCmykToRgb(cmykColor);
    };

@@ -76,6 +76,10 @@ export const About = () => {
                <a href={'https://dev.to/bytebodger/dithering-images-with-reactjavascript-och'}>
                   Dithering Images with React/JavaScript
                </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/color-mixing-with-javascript-1llh'}>
+                  Color Mixing With JavaScript
+               </a>
             </Typography>
          </Column>
       </Row>
