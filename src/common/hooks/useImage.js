@@ -666,14 +666,13 @@ export const useImage = () => {
          else
             return 0;
       };
-
       const { maximumColors, minimumThreshold } = indexState;
       const colorCounts = Object.entries(stats.colorCounts).filter(colorCount => {
          const [, count] = colorCount;
          return count >= minimumThreshold();
       })
       colorCounts.sort(sort);
-      return colorCounts.slice(0, maximumColors());
+      return maximumColors() ? colorCounts.slice(0, maximumColors()) : colorCounts;
    };
 
    return {
