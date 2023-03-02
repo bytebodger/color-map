@@ -88,6 +88,10 @@ export const About = () => {
                <a href={'https://dev.to/bytebodger/reducing-color-depth-with-reactjavascript-4gg5'}>
                   Reducing Color Depth with React/JavaScript
                </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/create-paint-by-numbers-from-digital-images-with-reactjavascript-2dc9'}>
+                  Paint-by-Numbers From Digital Images With React/JavaScript
+               </a>
             </Typography>
          </Column>
       </Row>
