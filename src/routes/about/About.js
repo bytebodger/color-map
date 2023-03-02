@@ -84,6 +84,10 @@ export const About = () => {
                <a href={'https://dev.to/bytebodger/using-virtual-color-mixing-to-extend-your-palette-in-reactjavascript-l41'}>
                   Using Virtual Color Mixing to Extend Your Palette in React/JavaScript
                </a>
+               <br/><br/>
+               <a href={'https://dev.to/bytebodger/reducing-color-depth-with-reactjavascript-4gg5'}>
+                  Reducing Color Depth with React/JavaScript
+               </a>
             </Typography>
          </Column>
       </Row>
