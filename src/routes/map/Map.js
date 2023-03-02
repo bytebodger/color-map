@@ -48,8 +48,9 @@ export const Map = () => {
          tableCells.push(
             <td
                className={'cell'}
+               id={cell.name}
                key={`cell-${rowIndex}-${cellIndex}`}
-               onClick={() => uiState.toggleHighlightedColor(cell.name)}
+               onClick={handleCellClick}
                style={{
                   backgroundColor,
                   borderWidth: highlightedColor === cell.name ? 5 : 0,
@@ -74,6 +75,11 @@ export const Map = () => {
          )
       })
       return tableRows;
+   }
+
+   const handleCellClick = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      uiState.toggleHighlightedColor(event.target.id);
    }
 
    const navigateToStats = () => navigateTo('/stats');
