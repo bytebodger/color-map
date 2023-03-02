@@ -32,8 +32,7 @@ export const Map = () => {
    const getTableCells = (cells = [rgbModel], rowIndex = -1) => {
       allow.anArrayOfInstances(cells, rgbModel).anInteger(rowIndex, is.not.negative);
       const { highlightedColor } = uiState;
-      const tableCells = [];
-      cells.forEach((cell, cellIndex) => {
+      return cells.map((cell, cellIndex) => {
          const paintIndex = colors.findIndex(color => color.name === cell.name);
          const darkness = (cell.red + cell.green + cell.blue) / 3;
          let color;
@@ -45,7 +44,7 @@ export const Map = () => {
             backgroundColor = `rgb(${cell.red}, ${cell.green}, ${cell.blue})`;
             color = darkness < 128 ? 'white' : 'black';
          }
-         tableCells.push(
+         return (
             <td
                className={'cell'}
                id={cell.name}
@@ -61,20 +60,17 @@ export const Map = () => {
             </td>
          );
       })
-      return tableCells;
    }
 
    const getTableRows = () => {
-      const tableRows = [];
       colors = allColors.get();
-      uiState.stats.map.forEach((row, rowIndex) => {
-         tableRows.push(
+      return uiState.stats.map.map((row, rowIndex) => {
+         return (
             <tr key={`row-${rowIndex}`}>
                {getTableCells(row, rowIndex)}
             </tr>
          )
       })
-      return tableRows;
    }
 
    const handleCellClick = (event = {}) => {

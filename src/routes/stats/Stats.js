@@ -39,11 +39,10 @@ export const Stats = () => {
    const getTableRows = () => {
       colors = allColors.get();
       const colorCounts = sortColorCounts(uiState.stats);
-      const rows = [];
-      colorCounts.forEach((colorCount, index) => {
+      return colorCounts.map((colorCount, index) => {
          const [paintName, count] = colorCount;
          const paintIndex = colors.findIndex(color => color.name === paintName);
-         rows.push(
+         return (
             <TableRow
                key={paintName}
                sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -64,7 +63,6 @@ export const Stats = () => {
             </TableRow>
          );
       })
-      return rows;
    }
 
    const handlePaintNameClick = (event = {}) => {
