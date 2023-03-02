@@ -10,6 +10,7 @@ import '../../common/css/baseProperties.css';
 import Typography from '@mui/material/Typography';
 import { local } from '@toolz/local-storage';
 import { logGooglePageHit } from '../../common/functions/logGooglePageHit';
+import './css/stats.css';
 
 export const Stats = () => {
    const uiState = useContext(UIState);
@@ -51,11 +52,25 @@ export const Stats = () => {
                <TableCell style={{textAlign: css3.textAlign.center}}>{paintIndex}</TableCell>
                <TableCell style={{textAlign: css3.textAlign.center}}>{count}</TableCell>
                {getColorCell(paintName)}
-               <TableCell>{paintName}</TableCell>
+               <TableCell>
+                  <span
+                     className={'paintName'}
+                     id={paintName}
+                     onClick={handlePaintNameClick}
+                  >
+                     {paintName}
+                  </span>
+               </TableCell>
             </TableRow>
          );
       })
       return rows;
+   }
+
+   const handlePaintNameClick = (event = {}) => {
+      allow.anObject(event, is.not.empty);
+      uiState.toggleHighlightedColor(event.target.id);
+      navigateTo('/map');
    }
 
    const sortColorCounts = (stats = {}) => {
