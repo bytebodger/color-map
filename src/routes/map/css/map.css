@@ -7,6 +7,8 @@
     min-height: 50px;
     min-width: 50px;
     text-align: center;
+    transform-origin: 0 0;
+    transform: scaleX(1) scaleY(1);
     vertical-align: middle;
     width: 50px;
 }
