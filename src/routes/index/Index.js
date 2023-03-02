@@ -112,7 +112,7 @@ export const Index = () => {
 
    const getMinimumThresholdOptions = () => {
       const options = [];
-      for (let i = 1; i <= 20; i++) {
+      for (let i = 1; i <= 40; i++) {
          options.push(
             <MenuItem
                key={`minimumThreshold-${i}`}
