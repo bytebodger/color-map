@@ -26,6 +26,8 @@ import { css3 } from '@toolz/css3/src/css3';
 import { Stats } from './routes/stats/Stats';
 import { Map } from './routes/map/Map';
 import { Mix } from './routes/mix/Mix';
+import { allow } from '@toolz/allow-react';
+import { is } from './common/objects/is';
 
 const drawerWidth = 240;
 
@@ -33,6 +35,7 @@ export const UIState = createContext({});
 
 export const UI = props => {
    const {window} = props;
+   const [highlightedColor, setHighlightedColor] = useState('');
    const [mobileOpen, setMobileOpen] = useState(false);
    const [showCanvas, setShowCanvas] = useState(false);
    const [showPostImageLinks, setShowPostImageLinks] = useState(false);
@@ -83,16 +86,23 @@ export const UI = props => {
 
    const handleDrawerToggle = () => setMobileOpen(prevState => !prevState);
 
+   const toggleHighlightedColor = (colorName = '') => {
+      allow.aString(colorName, is.not.empty);
+      setHighlightedColor(previousValue => previousValue === colorName ? '' : colorName);
+   }
+
    return <>
       <UIState.Provider value={{
          blob,
          file,
+         highlightedColor,
          setShowCanvas,
          setShowPostImageLinks,
          setStats,
          showCanvas,
          showPostImageLinks,
          stats,
+         toggleHighlightedColor,
       }}>
          <Box sx={{display: 'flex'}}>
             <CssBaseline/>

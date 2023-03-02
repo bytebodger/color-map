@@ -1,4 +1,7 @@
 .cell {
+    border-color: red;
+    border-style: solid;
+    cursor: pointer;
     font-weight: bold;
     height: 50px;
     min-height: 50px;

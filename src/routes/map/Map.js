@@ -31,17 +31,29 @@ export const Map = () => {
 
    const getTableCells = (cells = [rgbModel], rowIndex = -1) => {
       allow.anArrayOfInstances(cells, rgbModel).anInteger(rowIndex, is.not.negative);
+      const { highlightedColor } = uiState;
       const tableCells = [];
       cells.forEach((cell, cellIndex) => {
          const paintIndex = colors.findIndex(color => color.name === cell.name);
          const darkness = (cell.red + cell.green + cell.blue) / 3;
+         let color;
+         let backgroundColor;
+         if (highlightedColor === cell.name) {
+            backgroundColor = '#39ff14';
+            color = 'red';
+         } else {
+            backgroundColor = `rgb(${cell.red}, ${cell.green}, ${cell.blue})`;
+            color = darkness < 128 ? 'white' : 'black';
+         }
          tableCells.push(
             <td
                className={'cell'}
                key={`cell-${rowIndex}-${cellIndex}`}
+               onClick={() => uiState.toggleHighlightedColor(cell.name)}
                style={{
-                  backgroundColor: `rgb(${cell.red}, ${cell.green}, ${cell.blue})`,
-                  color: darkness < 128 ? 'white': 'black',
+                  backgroundColor,
+                  borderWidth: highlightedColor === cell.name ? 5 : 0,
+                  color,
                }}
             >
                {paintIndex}
@@ -82,7 +94,8 @@ export const Map = () => {
             >
                STATS
             </span>{` `}
-            link in the top nav bar.
+            link in the top nav bar.  Also, clicking on any of the color squares in the image below will highlight <i>every</i> instance
+            of that color in the map.  Clicking the same color again will toggle the highlighting <i>off</i>.
          </Typography>
       </div>
       <table className={'borderSpacing_0'}>
