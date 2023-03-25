@@ -22,7 +22,6 @@ export const useImage = () => {
    let blocksProcessed;
    let previousProgress;
    let currentProgress;
-   let outputCounter = 0;
 
    useEffect(() => {
       canvas.current = document.getElementById('canvas');
@@ -378,11 +377,6 @@ export const useImage = () => {
             case algorithms.XYZ:
                const {x: paletteX, y: paletteY, z: paletteZ} = convertRgbToXyz(paletteColor);
                const {x: referenceX, y: referenceY, z: referenceZ} = convertRgbToXyz(referenceColor);
-               outputCounter++;
-               if (outputCounter < 10) {
-                  //console.log('palette', paletteX, paletteY, paletteZ);
-                  //console.log('reference', referenceX, referenceY, referenceZ);
-               }
                distance = Math.sqrt(
                   Math.pow(referenceX - paletteX, 2)
                   + Math.pow(referenceY - paletteY, 2)
@@ -392,11 +386,6 @@ export const useImage = () => {
             case algorithms.CMYK:
                const {cyan: paletteCyan, magenta: paletteMagenta, yellow: paletteYellow, key: paletteKey} = convertRgbToCmyk(paletteColor);
                const {cyan: referenceCyan, magenta: referenceMagenta, yellow: referenceYellow, key: referenceKey} = convertRgbToCmyk(referenceColor);
-               outputCounter++;
-               if (outputCounter < 10) {
-                  //console.log('palette', paletteCyan, paletteMagenta, paletteYellow, paletteKey);
-                  //console.log('reference', referenceCyan, referenceMagenta, referenceYellow, referenceKey);
-               }
                distance = Math.sqrt(
                   Math.pow(referenceCyan - paletteCyan, 2)
                   + Math.pow(referenceMagenta - paletteMagenta, 2)
@@ -407,11 +396,6 @@ export const useImage = () => {
             case algorithms.HSL:
                const {hue: paletteHue, saturation: paletteSaturation, lightness: paletteLightness} = convertRgbToHsl(paletteColor);
                const {hue: referenceHue, saturation: referenceSaturation, lightness: referenceLightness} = convertRgbToHsl(referenceColor);
-               outputCounter++;
-               if (outputCounter < 10) {
-                  //console.log('palette', paletteHue, paletteSaturation, paletteLightness);
-                  //console.log('reference', referenceHue, referenceSaturation, referenceLightness);
-               }
                distance = Math.sqrt(
                   Math.pow(referenceHue - paletteHue, 2)
                   + Math.pow(referenceSaturation - paletteSaturation, 2)
