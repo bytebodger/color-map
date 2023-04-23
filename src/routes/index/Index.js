@@ -48,7 +48,7 @@ export const Index = () => {
    const file = useFile();
    const navigateTo = useNavigate();
    const hasViewedMapOrStats = local.getItem('hasViewedMapOrStats', false);
-   const { algorithm, blockSize, colorOrGreyscale, dither,matchToPalette, maximumColors, minimumThreshold, palettes } = indexState;
+   const { algorithm, blockSize, colorOrGreyscale, dither, matchToPalette, maximumColors, minimumThreshold, palettes, progress } = indexState;
 
    useEffect(() => {
       if (!uiState.showCanvas)
@@ -276,12 +276,36 @@ export const Index = () => {
          open={indexState.showProcessing}
       >
          <div className={'textAlignCenter'}>
-            <CircularProgress color={'inherit'}/>
+            <Box sx={{
+               display: 'inline-flex',
+               position: 'relative',
+            }}>
+               <CircularProgress
+                  color={'success'}
+                  value={progress}
+                  variant={'determinate'}
+               />
+               <Box sx={{
+                  alignItems: 'center',
+                  bottom: 0,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  left: 0,
+                  position: 'absolute',
+                  right: 0,
+                  top: 0,
+               }}>
+                  <Typography
+                     color={'white'}
+                     component={'div'}
+                     variant={'caption'}
+                  >
+                     {`${progress}%`}
+                  </Typography>
+               </Box>
+            </Box>
             <br/>
             Image Processing...
-            <br/>
-            <br/>
-            (This won't time out in your browser if you open the Inspector Tools.)
          </div>
       </Backdrop>
       <Modal

@@ -49,6 +49,7 @@ export const IndexContainer = () => {
    const [paletteList, setPaletteList] = useState(getPaletteList());
    const [paletteArray, setPaletteArray] = useState(getPaletteArray());
    const [palettes, setPalettes] = useSynchronousState(local.getItem('palettes') || {});
+   const [progress, setProgress] = useState(0);
    const [showProcessing, setShowProcessing] = useState(false);
 
    return <>
@@ -63,6 +64,7 @@ export const IndexContainer = () => {
          paletteArray,
          paletteList,
          palettes,
+         progress,
          setAlgorithm,
          setBlockSize,
          setColorOrGreyscale,
@@ -73,6 +75,7 @@ export const IndexContainer = () => {
          setPaletteArray,
          setPaletteList,
          setPalettes,
+         setProgress,
          setShowProcessing,
          showProcessing,
       }}>

@@ -27,7 +27,7 @@ export const useImage = () => {
       canvas.current = document.getElementById('canvas');
    }, []);
 
-   const adjustColorDepth = (stats = {}) => {
+   const adjustColorDepth = async (stats = {}) => {
       allow.anObject(stats, is.not.empty);
       const imageData = context.current.getImageData(0, 0, canvas.current.width, canvas.current.height);
       const adjustedStats = {
@@ -326,17 +326,19 @@ export const useImage = () => {
       const source = src === '' ? image.current.src : src;
       const newImage = new Image();
       newImage.src = source;
-      newImage.onload = () => {
-         indexState.setShowProcessing(false);
+      newImage.onload = async () => {
+         indexState.setProgress(0);
+         await pause();
+         //indexState.setShowProcessing(false);
          image.current = newImage;
          canvas.current.width = newImage.width;
          canvas.current.height = newImage.height;
          context.current = canvas.current.getContext('2d', {alpha: false, willReadFrequently: true});
          context.current.drawImage(newImage, 0, 0);
-         let stats = pixelate();
+         let stats = await pixelate();
          const { matchToPalette, maximumColors, minimumThreshold } = indexState;
          if (matchToPalette() && (maximumColors() !== 0 || minimumThreshold() > 1))
-            stats = adjustColorDepth(stats);
+            stats = await adjustColorDepth(stats);
          else
             indexState.setShowProcessing(false);
          uiState.setStats(stats);
@@ -532,7 +534,11 @@ export const useImage = () => {
       return convertCmykToRgb(cmykColor);
    };
 
-   const pixelate = () => {
+   const pause = () => {
+      return new Promise(r => setTimeout(r, 10))
+   }
+
+   const pixelate = async () => {
       const { height, width } = canvas.current;
       const stats = {
          colorCounts: {},
@@ -582,9 +588,10 @@ export const useImage = () => {
             context.current.fillRect(x, y, blockX, blockY);
             blocksProcessed++;
          }
-         currentProgress = Math.ceil((blocksProcessed / totalBlocks) * 100);
-         if (currentProgress !== previousProgress && currentProgress % 5 === 0) {
-            console.log(`${currentProgress}% complete`);
+         currentProgress = Math.ceil((blocksProcessed / totalBlocks) * 100) - 2;
+         if (currentProgress !== previousProgress && currentProgress % 2 === 0) {
+            indexState.setProgress(previousState => previousState + 2);
+            await pause();
          }
          previousProgress = currentProgress;
          stats.map.push(row);
