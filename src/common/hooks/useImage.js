@@ -535,7 +535,7 @@ export const useImage = () => {
    };
 
    const pause = () => {
-      return new Promise(r => setTimeout(r, 10))
+      return new Promise(resolve => setTimeout(resolve, 10))
    }
 
    const pixelate = async () => {
