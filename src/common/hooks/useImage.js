@@ -459,7 +459,10 @@ export const useImage = () => {
    }
 
    const loadPalettes = () => {
-      const { palettes: chosenPalettes } = indexState;
+      const { colorOrGreyscale, palettes: chosenPalettes } = indexState;
+      let { basePaints: paints } = palettes;
+      if (colorOrGreyscale() === 'greyscale')
+         paints = paints.filter(paint => ['Liquitex: Ivory Black', 'Liquitex: Titanium White'].includes(paint.name));
       const white = {
          red: 255,
          green: 255,
@@ -472,42 +475,42 @@ export const useImage = () => {
             return;
          switch (name) {
             case 'quarterWhites':
-               palettes.basePaints.forEach(paint => {
+               paints.forEach(paint => {
                   const mixed = mixRgbColorsSubtractively([paint, paint, paint, white]);
                   mixed.name = `${paint.name} (1/4 White)`;
                   palette.push(mixed);
                });
                break;
             case 'thirdWhites':
-               palettes.basePaints.forEach(paint => {
+               paints.forEach(paint => {
                   const mixed = mixRgbColorsSubtractively([paint, paint, white]);
                   mixed.name = `${paint.name} (1/3 White)`;
                   palette.push(mixed);
                });
                break;
             case 'halfWhites':
-               palettes.basePaints.forEach(paint => {
+               paints.forEach(paint => {
                   const mixed = mixRgbColorsSubtractively([paint, white]);
                   mixed.name = `${paint.name} (1/2 White)`;
                   palette.push(mixed);
                });
                break;
             case 'twoThirdWhites':
-               palettes.basePaints.forEach(paint => {
+               paints.forEach(paint => {
                   const mixed = mixRgbColorsSubtractively([paint, white, white]);
                   mixed.name = `${paint.name} (2/3 White)`;
                   palette.push(mixed);
                });
                break;
             case 'threeQuarterWhites':
-               palettes.basePaints.forEach(paint => {
+               paints.forEach(paint => {
                   const mixed = mixRgbColorsSubtractively([paint, white, white, white]);
                   mixed.name = `${paint.name} (3/4 White)`;
                   palette.push(mixed);
                });
                break;
             default:
-               palette = [...palette, ...palettes[name]];
+               palette = [...palette, ...paints];
          }
       });
    };
@@ -545,7 +548,7 @@ export const useImage = () => {
          colors: [],
          map: [],
       };
-      const { algorithm, blockSize, colorOrGreyscale, matchToPalette } = indexState;
+      const { algorithm, blockSize, matchToPalette } = indexState;
       if (matchToPalette())
          loadPalettes();
       totalBlocks = Math.ceil(height / blockSize()) * Math.ceil(width / blockSize());
@@ -567,12 +570,6 @@ export const useImage = () => {
                red: averageColor.red,
                name: '',
             };
-            if (colorOrGreyscale() === 'greyscale') {
-               const darkness = Math.round((averageColor.red + averageColor.green + averageColor.blue) / 3);
-               referenceColor.red = darkness;
-               referenceColor.green = darkness;
-               referenceColor.blue = darkness;
-            }
             const closestColor = matchToPalette() ? getClosestColorInThePalette(referenceColor) : averageColor;
             if (!closestColor.name)
                closestColor.name = `${closestColor.red}_${closestColor.green}_${closestColor.blue}`;

@@ -74,7 +74,7 @@ export const Index = () => {
 
    const getBlockSizeOptions = () => {
       const options = [];
-      for (let i = 5; i <= 50; i++) {
+      for (let i = 2; i <= 50; i++) {
          options.push(
             <MenuItem
                key={`blockSize-${i}`}
