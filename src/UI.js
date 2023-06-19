@@ -34,7 +34,7 @@ const drawerWidth = 240;
 export const UIState = createContext({});
 
 export const UI = props => {
-   const {window} = props;
+   const [gridOutline, setGridOutline] = useState(10);
    const [highlightedColor, setHighlightedColor] = useState('');
    const [mobileOpen, setMobileOpen] = useState(false);
    const [showCanvas, setShowCanvas] = useState(false);
@@ -43,6 +43,7 @@ export const UI = props => {
    const blob = useRef(null);
    const file = useRef(null);
    const navigateTo = useNavigate();
+   const {window} = props;
 
    const container = window !== undefined ? () => window().document.body : undefined;
 
@@ -95,6 +96,8 @@ export const UI = props => {
       <UIState.Provider value={{
          blob,
          file,
+         gridOutline,
+         setGridOutline,
          highlightedColor,
          setShowCanvas,
          setShowPostImageLinks,
