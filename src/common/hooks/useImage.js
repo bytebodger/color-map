@@ -462,7 +462,27 @@ export const useImage = () => {
       const { colorOrGreyscale, palettes: chosenPalettes } = indexState;
       let { basePaints: paints } = palettes;
       if (colorOrGreyscale() === 'greyscale')
-         paints = paints.filter(paint => ['Liquitex: Ivory Black', 'Liquitex: Titanium White'].includes(paint.name));
+         paints = paints.filter(paint => [
+            'Golden: Graphite Gray',
+            'Golden: Neutral Gray N2',
+            'Golden: Neutral Gray N3',
+            'Golden: Neutral Gray N4',
+            'Golden: Neutral Gray N5',
+            'Golden: Neutral Gray N6',
+            'Golden: Neutral Gray N7',
+            'Golden: Neutral Gray N8',
+            'Golden: Raw Umber',
+            'Liquitex: Irisdescent Bright Silver',
+            'Liquitex: Irisdescent Rich Silver',
+            'Liquitex: Irisdescent White',
+            'Liquitex: Ivory Black',
+            'Liquitex: Muted Grey',
+            'Liquitex: Neutral Gray 5',
+            'Liquitex: Parchment',
+            'Liquitex: Payne\'s Gray',
+            'Liquitex: Raw Umber',
+            'Liquitex: Titanium White'
+         ].includes(paint.name));
       const white = {
          red: 255,
          green: 255,
