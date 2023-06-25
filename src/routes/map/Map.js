@@ -52,9 +52,10 @@ export const Map = () => {
          const paintIndex = colors.findIndex(color => color.name === cell.name);
          const darkness = (cell.red + cell.green + cell.blue) / 3;
          const isRightGridOutline = gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0);
+         const isHighlightedCell = highlightedColor === cell.name;
          let color;
          let backgroundColor;
-         if (highlightedColor === cell.name) {
+         if (isHighlightedCell) {
             backgroundColor = '#39ff14';
             color = 'red';
          } else {
@@ -63,10 +64,10 @@ export const Map = () => {
          }
          let style = {
             backgroundColor,
-            borderBottomWidth: highlightedColor === cell.name ? 5 : 0,
-            borderLeftWidth: highlightedColor === cell.name ? 5 : 0,
-            borderRightWidth: highlightedColor === cell.name || isRightGridOutline ? 5 : 0,
-            borderTopWidth: highlightedColor === cell.name ? 5 : 0,
+            borderBottomWidth: isHighlightedCell ? 5 : 0,
+            borderLeftWidth: isHighlightedCell ? 5 : 0,
+            borderRightWidth: isHighlightedCell || isRightGridOutline ? 5 : 0,
+            borderTopWidth: isHighlightedCell ? 5 : 0,
             color,
          }
          if (isRightGridOutline)
