@@ -62,7 +62,10 @@ export const Map = () => {
          }
          let style = {
             backgroundColor,
-            borderWidth: highlightedColor === cell.name ? 5 : 0,
+            borderBottomWidth: highlightedColor === cell.name ? 5 : 0,
+            borderLeftWidth: highlightedColor === cell.name ? 5 : 0,
+            borderRightWidth: highlightedColor === cell.name || (gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0)) ? 5 : 0,
+            borderTopWidth: highlightedColor === cell.name ? 5 : 0,
             color,
          }
          if (gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0))
