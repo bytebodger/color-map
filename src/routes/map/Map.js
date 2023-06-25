@@ -51,6 +51,7 @@ export const Map = () => {
       return cells.map((cell, cellIndex) => {
          const paintIndex = colors.findIndex(color => color.name === cell.name);
          const darkness = (cell.red + cell.green + cell.blue) / 3;
+         const isRightGridOutline = gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0);
          let color;
          let backgroundColor;
          if (highlightedColor === cell.name) {
@@ -64,11 +65,11 @@ export const Map = () => {
             backgroundColor,
             borderBottomWidth: highlightedColor === cell.name ? 5 : 0,
             borderLeftWidth: highlightedColor === cell.name ? 5 : 0,
-            borderRightWidth: highlightedColor === cell.name || (gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0)) ? 5 : 0,
+            borderRightWidth: highlightedColor === cell.name || isRightGridOutline ? 5 : 0,
             borderTopWidth: highlightedColor === cell.name ? 5 : 0,
             color,
          }
-         if (gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0))
+         if (isRightGridOutline)
             style.borderRight = '5px solid red';
          return (
             <td
