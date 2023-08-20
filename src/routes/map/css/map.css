@@ -1,4 +1,5 @@
 .cell {
+    background: white;
     border-color: red;
     border-style: solid;
     cursor: pointer;
@@ -11,4 +12,64 @@
     transform: scaleX(1) scaleY(1);
     vertical-align: middle;
     width: 50px;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid black;
+    margin: 0;
+    table-layout: fixed;
+    white-space: nowrap;
+}
+
+table td,
+table th {
+    border: 1px solid black;
+    padding: 0.5rem 1rem;
+}
+
+table thead th {
+    background: white;
+    padding: 3px;
+    position: sticky;
+    top: 0;
+    width: 25vw;
+    z-index: 1;
+}
+
+table td {
+    background: #fff;
+    padding: 4px 5px;
+    text-align: center;
+}
+
+table tbody th {
+    font-weight: bold;
+    position: relative;
+    text-align: right;
+}
+
+table thead th:first-child {
+    left: 0;
+    position: sticky;
+    z-index: 2;
+}
+
+table tbody th {
+    background: white;
+    left: 0;
+    position: sticky;
+    z-index: 1;
+}
+
+[role="region"][aria-labelledby][tabindex] {
+    max-height: 80vh;
+    overflow: auto;
+    width: 100%;
+}
+
+[role="region"][aria-labelledby][tabindex]:focus {
+    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+    outline: 0;
 }

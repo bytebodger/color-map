@@ -17,6 +17,7 @@ export const Map = () => {
    const navigateTo = useNavigate();
    const allColors = useAllColors();
    let colors = [];
+   const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'W', 'X', 'Y', 'Z'];
 
    useEffect(() => {
       if (Object.keys(uiState.stats).length === 0) {
@@ -51,8 +52,9 @@ export const Map = () => {
       return cells.map((cell, cellIndex) => {
          const paintIndex = colors.findIndex(color => color.name === cell.name);
          const darkness = (cell.red + cell.green + cell.blue) / 3;
-         const isRightGridOutline = gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0);
          const isHighlightedCell = highlightedColor === cell.name;
+         const isBottomGridOutline = gridOutline && rowIndex && ((rowIndex + 1) % gridOutline === 0);
+         const isRightGridOutline = gridOutline && cellIndex && ((cellIndex + 1) % gridOutline === 0);
          let color;
          let backgroundColor;
          if (isHighlightedCell) {
@@ -64,10 +66,10 @@ export const Map = () => {
          }
          let style = {
             backgroundColor,
-            borderBottomWidth: isHighlightedCell ? 5 : 0,
-            borderLeftWidth: isHighlightedCell ? 5 : 0,
-            borderRightWidth: isHighlightedCell || isRightGridOutline ? 5 : 0,
-            borderTopWidth: isHighlightedCell ? 5 : 0,
+            borderBottomWidth: isBottomGridOutline ? 5 : 0,
+            borderLeftWidth: 0,
+            borderRightWidth: isRightGridOutline ? 5 : 0,
+            borderTopWidth: 0,
             color,
          }
          if (isRightGridOutline)
@@ -86,16 +88,43 @@ export const Map = () => {
       });
    };
 
+   const getTableHeaderCells = () => {
+      let columnCounter = -1;
+      const headerCells = [];
+      const outerLetters = ['', ...letters];
+      outerLetters.forEach(outerLetter => {
+         if (columnCounter >= uiState.stats.map.length)
+            return;
+         letters.forEach(letter => {
+            columnCounter++;
+            if (columnCounter >= uiState.stats.map.length)
+               return;
+            headerCells.push(
+               <th
+                  id={`headerCell-${columnCounter}`}
+                  key={`headerCell-${columnCounter}`}
+                  style={{
+                     background: 'white',
+                     border: '1px solid black',
+                     position: 'sticky',
+                     top: 0,
+                     zIndex: 1,
+                  }}
+               >
+                  {`${outerLetter}${letter}`}
+               </th>
+            )
+         })
+      })
+      return headerCells;
+   }
+
    const getTableRows = () => {
       colors = allColors.get();
-      const {gridOutline} = uiState;
       return uiState.stats.map.map((row, rowIndex) => {
-         const style = gridOutline && rowIndex && ((rowIndex + 1) % gridOutline === 0) ? {borderBottom: '5px solid red'} : {};
          return (
-            <tr
-               key={`row-${rowIndex}`}
-               style={style}
-            >
+            <tr key={`row-${rowIndex}`}>
+               <th>{rowIndex + 1}</th>
                {getTableCells(row, rowIndex)}
             </tr>
          );
@@ -156,14 +185,30 @@ export const Map = () => {
             </Select>
          </FormControl>
       </div>
-      <table
-         className={'borderSpacing_0'}
-         style={{borderCollapse: 'collapse'}}
+      <div
+         aria-labelledby={'caption'}
+         role={'region'}
+         tabIndex={0}
       >
-         <tbody>
-            {getTableRows()}
-         </tbody>
-      </table>
+         <table style={{
+            border: 'none',
+            borderCollapse: 'separate',
+            borderSpacing: 0,
+            margin: 0,
+            tableLayout: 'fixed',
+            whiteSpace: 'nowrap',
+         }}>
+            <thead>
+               <tr>
+                  <th/>
+                  {getTableHeaderCells()}
+               </tr>
+            </thead>
+            <tbody>
+               {getTableRows()}
+            </tbody>
+         </table>
+      </div>
       <div className={'minHeight_500'}></div>
    </>;
 };
