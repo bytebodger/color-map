@@ -33,7 +33,12 @@ export const Stats = () => {
    const getColorCell = (paintName = '') => {
       allow.aString(paintName, is.not.empty);
       const color = uiState.stats.colors.find(color => color.name === paintName);
-      return <TableCell style={{backgroundColor: `rgb(${color.red}, ${color.green}, ${color.blue})`}}/>;
+      return <TableCell style={{
+         backgroundColor: `rgb(${color.red}, ${color.green}, ${color.blue})`,
+         borderRight: '1px solid black',
+         maxWidth: '100px',
+         width: '100px',
+      }}/>;
    }
 
    const getTableRows = () => {
@@ -47,9 +52,30 @@ export const Stats = () => {
                key={paintName}
                sx={{'&:last-child td, &:last-child th': {border: 0}}}
             >
-               <TableCell style={{textAlign: css3.textAlign.center}}><b>{index + 1}.</b></TableCell>
-               <TableCell style={{textAlign: css3.textAlign.center}}>{paintIndex}</TableCell>
-               <TableCell style={{textAlign: css3.textAlign.center}}>{count}</TableCell>
+               <TableCell style={{
+                  borderRight: '1px solid black',
+                  maxWidth: '75px',
+                  textAlign: css3.textAlign.center,
+                  width: '75px',
+               }}>
+                  <b>{index + 1}.</b>
+               </TableCell>
+               <TableCell style={{
+                  borderRight: '1px solid black',
+                  maxWidth: '75px',
+                  textAlign: css3.textAlign.center,
+                  width: '75px',
+               }}>
+                  {paintIndex}
+               </TableCell>
+               <TableCell style={{
+                  borderRight: '1px solid black',
+                  maxWidth: '75px',
+                  textAlign: css3.textAlign.center,
+                  width: '75px',
+               }}>
+                  {count}
+               </TableCell>
                {getColorCell(paintName)}
                <TableCell>
                   <span
@@ -117,21 +143,33 @@ export const Stats = () => {
          >
             <TableHead>
                <TableRow>
-                  <TableCell style={{width: 75}}/>
                   <TableCell style={{
+                     borderBottom: '1px solid black',
+                     maxWidth: '75px',
+                     width: '75px',
+                  }}/>
+                  <TableCell style={{
+                     borderBottom: '1px solid black',
+                     maxWidth: '75px',
                      textAlign: css3.textAlign.center,
-                     width: 75,
+                     width: '75px',
                   }}>
                      <b>Ref</b>
                   </TableCell>
                   <TableCell style={{
+                     borderBottom: '1px solid black',
+                     maxWidth: '75px',
                      textAlign: css3.textAlign.center,
-                     width: 75,
+                     width: '75px',
                   }}>
                      <b>Blocks</b>
                   </TableCell>
-                  <TableCell/>
-                  <TableCell><b>Paint</b></TableCell>
+                  <TableCell style={{
+                     borderBottom: '1px solid black',
+                     maxWidth: '100px',
+                     width: '100px',
+                  }}/>
+                  <TableCell style={{ borderBottom: '1px solid black' }}><b>Paint</b></TableCell>
                </TableRow>
             </TableHead>
             <TableBody>
