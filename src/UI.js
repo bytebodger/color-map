@@ -120,8 +120,8 @@ export const UI = props => {
                   >
                      <MenuIcon/>
                      <span className={'marginLeft_24'}>
-               Paint Map Studio
-            </span>
+                        Paint Map Studio
+                     </span>
                   </IconButton>
                   <Typography
                      component={'div'}
@@ -172,8 +172,13 @@ export const UI = props => {
             </Box>
          </Box>
          <Row className={'row'}>
-            <Column xs={1}/>
-            <Column xs={10}>
+            <Column
+               xs={12}
+               sx={{
+                  marginLeft: 4,
+                  marginRight: 4,
+               }}
+            >
                <Routes>
                   <Route
                      element={
@@ -220,7 +225,6 @@ export const UI = props => {
                   <canvas id={'canvas'}></canvas>
                </div>
             </Column>
-            <Column xs={1}/>
          </Row>
       </UIState.Provider>
    </>;

@@ -87,7 +87,7 @@ export const Palettes = () => {
       allow.aString(paletteName);
       const rows = [];
       palettes.basePaints.forEach((palette, index) => {
-         if (index % 6 === 0) {
+         if (index % 3 === 0) {
             rows.push(
                <TableRow
                   key={`basePaintRows-${index}`}
