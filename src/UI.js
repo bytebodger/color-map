@@ -175,8 +175,8 @@ export const UI = props => {
             <Column
                xs={12}
                sx={{
-                  marginLeft: 4,
-                  marginRight: 4,
+                  paddingLeft: 4,
+                  paddingRight: 4,
                }}
             >
                <Routes>
