@@ -18,6 +18,7 @@ export const Map = () => {
    const allColors = useAllColors();
    let colors = [];
    const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+   const outlineIntervals = [0, 4, 6, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 45, 50];
 
    useEffect(() => {
       if (Object.keys(uiState.stats).length === 0) {
@@ -33,16 +34,16 @@ export const Map = () => {
 
    const getGridOutlineOptions = () => {
       const options = [];
-      for (let i = 0; i <= 50; i += 5) {
+      outlineIntervals.forEach(interval => {
          options.push(
             <MenuItem
-               key={`gridOutline-${i}`}
-               value={i}
+               key={`gridOutline-${interval}`}
+               value={interval}
             >
-               {i}
+               {interval}
             </MenuItem>,
          );
-      }
+      })
       return options;
    };
 
