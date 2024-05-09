@@ -83,7 +83,6 @@ export const palettes = Object.freeze({
       {red: 255, green: 255, blue: 255, name: 'Liquitex: Titanium White'},
       {red: 72, green: 30, blue: 20, name: 'Liquitex: Transparent Burnt Sienna'},
       {red: 43, green: 38, blue: 31, name: 'Liquitex: Transparent Burnt Umber'},
-      {red: 1000000, green: 1000000, blue: 1000000, name: 'Liquitex: Transparent Mixing White'},
       {red: 173, green: 101, blue: 0, name: 'Liquitex: Transparent Raw Sienna'},
       {red: 68, green: 64, blue: 56, name: 'Liquitex: Transparent Raw Umber'},
       {red: 26, green: 42, blue: 45, name: 'Liquitex: Transparent Viridian Hue'},
